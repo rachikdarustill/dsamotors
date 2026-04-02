@@ -232,6 +232,7 @@
         }
         .link {
             color: var(--primary);
+            cursor: pointer;
         }
         .link-disabled {
             pointer-events: none;
@@ -297,6 +298,12 @@
             display: flex;
             justify-content: center;
             margin-top: 14px;
+            gap: 12px;
+        }
+        .search-reset-btn {
+            background: #e2e6ea;
+            border-color: #cbd3da;
+            color: #2c3e50;
         }
 
         /* Benefits */
@@ -441,6 +448,14 @@
                 height: 52px;
             }
         }
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--white);
+            border-radius: 16px;
+            border: 1px solid var(--muted);
+            color: #6a6c6d;
+        }
     </style>
 </head>
 <body>
@@ -465,7 +480,7 @@
                 <h1>Оригинальные запчасти для Mercedes‑Benz</h1>
                 <p>Поиск по VIN Mercedes или номеру детали. Подбор для популярных серий — от C‑Class и E‑Class до GLE и Sprinter. Быстрая доставка по всей России.</p>
                 <form id="search" class="search" action="#" role="search" aria-label="Поиск запчастей">
-                    <input type="text" name="q" placeholder="VIN Mercedes / номер детали" aria-label="VIN Mercedes или номер детали">
+                    <input type="text" name="q" id="searchInput" placeholder="VIN Mercedes / номер детали" aria-label="VIN Mercedes или номер детали">
                     <select aria-label="Марка" disabled>
                         <option value="Mercedes-Benz">Mercedes‑Benz</option>
                     </select>
@@ -503,7 +518,6 @@
     </section>
 
     <main>
-        <!-- Секция Категории запчастей (карточки некликабельные) -->
         <section id="categories" class="section container">
             <div class="section-header">
                 <h2 class="section-title">Категории запчастей Mercedes‑Benz</h2>
@@ -529,15 +543,15 @@
             </div>
         </section>
 
-        <!-- Секция Популярные товары (кнопки "В корзину" удалены) -->
         <section id="popular" class="section container">
-            <div class="section-header">
-                <h2 class="section-title">Популярные товары для Mercedes‑Benz</h2>
-                <span class="link link-disabled" aria-disabled="true">Каталог</span>
+            <div class="section-header" id="popularHeader">
+                <h2 class="section-title" id="popularTitle">Популярные товары для Mercedes‑Benz</h2>
+                <span id="catalogLink" class="link link-disabled" aria-disabled="true">Каталог</span>
             </div>
             <div class="grid" id="popular-grid" aria-live="polite"></div>
-            <div class="popular-more">
+            <div class="popular-more" id="popularControls">
                 <button id="popular-show-more" class="btn primary" type="button">Показать еще</button>
+                <button id="resetSearchBtn" class="btn search-reset-btn" type="button" style="display: none;">Вернуть популярные</button>
             </div>
         </section>
 
@@ -601,7 +615,6 @@
                 </div>
                 <p style="margin:0;color:#6a6c6d;">Интернет-магазин запчастей для Mercedes‑Benz.</p>
             </div>
-            <!-- Категории в футере: некликабельные span -->
             <div class="footer-col">
                 <h5>Категории</h5>
                 <span class="non-clickable">Двигатель (M‑серии)</span>
@@ -609,14 +622,13 @@
                 <span class="non-clickable">Подвеска и рулевое</span>
                 <span class="non-clickable">Электрика и датчики</span>
             </div>
-            <!-- Покупателям: некликабельные span -->
             <div class="footer-col">
                 <h5>Покупателям</h5>
                 <span class="non-clickable">Доставка и оплата</span>
                 <span class="non-clickable">Гарантия и возврат</span>
                 <span class="non-clickable">Поддержка</span>
+                <span class="non-clickable">Личный кабинет</span>
             </div>
-            <!-- Контакты остаются кликабельными -->
             <div class="footer-col">
                 <h5>Контакты</h5>
                 <a href="mailto:support@dsamotors.com">support@dsamotors.com</a>
@@ -634,40 +646,28 @@
     </a>
 
     <script>
-        // Год в копирайте
-        const yearEl = document.getElementById('year');
-        if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-        // Поиск
-        const searchForm = document.getElementById('search');
-        if (searchForm) {
-            searchForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-                const formData = new FormData(searchForm);
-                const query = (formData.get('q') || '').toString().trim();
-                alert(query ? `Ищем: ${query}` : 'Введите VIN или номер детали');
-            });
-        }
-
-        // --- Данные и рендер для популярных товаров (без кнопки "В корзину") ---
-        const POPULAR_FEED_URL = './feed.csv';
+        // Глобальные переменные
+        let allParts = [];           // все детали из CSV (с полями name, category, price, image, oem)
+        let popularSourceItems = []; // исходный список для популярных товаров (после загрузки)
+        let currentMode = 'popular'; // 'popular' или 'search'
+        let currentSearchQuery = '';
+        let showMoreClicks = 0;
+        const SHOW_MORE_LIMIT = 10;
         const POPULAR_COUNT = 8;
 
-        const fallbackPopularItems = [
-            { name: 'A 270 180 00 09 (M270/M274)', category: 'Масляный фильтр', price: 1290 },
-            { name: 'A 005 420 59 20 (W205/W213)', category: 'Тормозные колодки', price: 3990 },
-            { name: 'A 205 320 07 30 (C‑Class W205)', category: 'Амортизатор (передний)', price: 5450 },
-            { name: 'A 000 982 96 08 (E‑Class/GLE)', category: 'АКБ AGM 80Ah', price: 7990 },
-            { name: 'A 274 094 01 04 (M274)', category: 'Воздушный фильтр', price: 1590 },
-            { name: 'A 000 905 34 03', category: 'Датчик ABS', price: 2890 },
-            { name: 'A 220 830 03 18', category: 'Радиатор кондиционера', price: 6450 },
-            { name: 'A 213 323 00 00', category: 'Опора амортизатора', price: 2190 },
-            { name: 'A 651 090 00 52', category: 'Топливный фильтр', price: 1890 },
-            { name: 'A 447 421 04 12', category: 'Тормозной диск', price: 3590 },
-            { name: 'A 166 880 13 40', category: 'Решетка радиатора', price: 7590 },
-            { name: 'A 246 500 00 49', category: 'Расширительный бачок', price: 2490 }
-        ];
+        // DOM элементы
+        const yearEl = document.getElementById('year');
+        const searchForm = document.getElementById('search');
+        const searchInput = document.getElementById('searchInput');
+        const popularGrid = document.getElementById('popular-grid');
+        const popularTitle = document.getElementById('popularTitle');
+        const catalogLink = document.getElementById('catalogLink');
+        const showMoreBtn = document.getElementById('popular-show-more');
+        const resetSearchBtn = document.getElementById('resetSearchBtn');
 
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+        // Вспомогательные функции
         function formatRub(value) {
             return `${Math.round(Number(value) || 0).toLocaleString('ru-RU')} ₽`;
         }
@@ -690,6 +690,7 @@
             return candidates[0] || '';
         }
 
+        // Парсинг CSV с поддержкой OEM (столбец N) и Title (столбец D)
         function parseFeed(csvText) {
             const rows = [];
             const text = csvText.replace(/^\uFEFF/, '');
@@ -721,33 +722,43 @@
                     current += ch;
                 }
             }
-
             if (current.length > 0 || row.length > 0) {
                 row.push(current.trim());
                 rows.push(row);
             }
             if (!rows.length) return [];
 
-            const headers = rows[0].map((h) => h.toLowerCase());
-            const nameIndex = headers.findIndex((h) => /title|name|наимен/.test(h));
-            const categoryIndex = headers.findIndex((h) => /category|категор/.test(h));
-            const priceIndex = headers.findIndex((h) => /price|цена/.test(h));
-            const imageIndex = headers.findIndex((h) => h === 'images1' || /image1|изображ/.test(h));
+            const headers = rows[0].map((h) => h.toLowerCase().replace(/^["']|["']$/g, ''));
+            // Определяем индексы: Title (D) -> 4-й столбец (индекс 3), OEM (N) -> 14-й столбец (индекс 13)
+            // Но также ищем по именам столбцов
+            let titleIndex = headers.findIndex(h => /title|наименование|name/.test(h));
+            let oemIndex = headers.findIndex(h => /oem|артикул|partnumber/.test(h));
+            let categoryIndex = headers.findIndex(h => /category|категор/.test(h));
+            let priceIndex = headers.findIndex(h => /price|цена/.test(h));
+            let imageIndex = headers.findIndex(h => h === 'images1' || /image1|изображ/.test(h));
+
+            // Если заголовки не найдены, используем позиции: D -> индекс 3, N -> индекс 13 (если колонок достаточно)
+            if (titleIndex === -1 && rows[0].length > 3) titleIndex = 3;
+            if (oemIndex === -1 && rows[0].length > 13) oemIndex = 13;
+            if (categoryIndex === -1 && rows[0].length > 2) categoryIndex = 2;
+            if (priceIndex === -1 && rows[0].length > 4) priceIndex = 4;
+            if (imageIndex === -1 && rows[0].length > 5) imageIndex = 5;
 
             return rows.slice(1).map((cols) => {
-                const rawName = cols[nameIndex >= 0 ? nameIndex : 0] || '';
-                const rawCategory = cols[categoryIndex >= 0 ? categoryIndex : 0] || 'Запчасть';
-                const rawPrice = cols[priceIndex >= 0 ? priceIndex : 0] || '';
-                const rawImage = cols[imageIndex >= 0 ? imageIndex : -1] || '';
+                const rawTitle = (titleIndex >= 0 && cols[titleIndex]) ? cols[titleIndex] : (cols[0] || '');
+                const rawOEM = (oemIndex >= 0 && cols[oemIndex]) ? cols[oemIndex] : '';
+                const rawCategory = (categoryIndex >= 0 && cols[categoryIndex]) ? cols[categoryIndex] : 'Запчасть';
+                const rawPrice = (priceIndex >= 0 && cols[priceIndex]) ? cols[priceIndex] : '';
+                const rawImage = (imageIndex >= 0 && cols[imageIndex]) ? cols[imageIndex] : '';
                 const numericPrice = Number(String(rawPrice).replace(/[^\d.,]/g, '').replace(',', '.'));
                 return {
-                    name: rawName || 'Деталь Mercedes‑Benz',
+                    name: rawTitle || 'Деталь Mercedes‑Benz',
                     category: rawCategory || 'Запчасть',
                     price: Number.isFinite(numericPrice) ? numericPrice : 0,
                     image: extractPrimaryImage(rawImage),
-                    url: '#'
+                    oem: rawOEM,
                 };
-            }).filter((item) => item.name);
+            }).filter(item => item.name);
         }
 
         function shuffle(arr) {
@@ -759,72 +770,141 @@
             return copy;
         }
 
-        // Отрисовка карточек без кнопки "В корзину"
-        function renderPopularCards(items) {
+        // Рендер карточек (без кнопки корзины)
+        function renderCards(items) {
+            if (!items.length) {
+                return `<div class="no-results">🔍 По запросу «${escapeHtml(currentSearchQuery)}» ничего не найдено.<br>Попробуйте другой номер детали.</div>`;
+            }
             return items.map((item) => {
-                const imageHtml = item.image ? `<img class="product-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name || 'Изображение товара')}" loading="lazy">` : '';
+                const imageHtml = item.image ? `<img class="product-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy">` : '';
                 return `
                     <div class="card">
                         ${imageHtml}
-                        <div class="pill">${escapeHtml(item.category || 'Запчасть')}</div>
-                        <div class="product-title">${escapeHtml(item.name || 'Деталь Mercedes‑Benz')}</div>
+                        <div class="pill">${escapeHtml(item.category)}</div>
+                        <div class="product-title">${escapeHtml(item.name)}</div>
                         <div><span class="price">${formatRub(item.price)}</span></div>
+                        ${item.oem ? `<div style="font-size: 11px; color: #8e9091; margin-top: 6px;">OEM: ${escapeHtml(item.oem)}</div>` : ''}
                     </div>
                 `;
             }).join('');
         }
 
         function renderPopular(items) {
-            const popularGrid = document.getElementById('popular-grid');
             if (!popularGrid) return;
-            popularGrid.innerHTML = renderPopularCards(items);
+            popularGrid.innerHTML = renderCards(items);
         }
 
         function appendPopular(items) {
-            const popularGrid = document.getElementById('popular-grid');
             if (!popularGrid) return;
-            popularGrid.insertAdjacentHTML('beforeend', renderPopularCards(items));
+            popularGrid.insertAdjacentHTML('beforeend', renderCards(items));
         }
 
-        async function setupPopularRotation() {
-            let sourceItems = fallbackPopularItems;
-            let showMoreClicks = 0;
-            const SHOW_MORE_LIMIT = 10;
+        // Поиск по OEM (столбец N)
+        function searchByOEM(query) {
+            if (!query.trim()) return [];
+            const lowerQuery = query.trim().toLowerCase();
+            return allParts.filter(item => item.oem && item.oem.toLowerCase().includes(lowerQuery));
+        }
 
+        // Показать результаты поиска
+        function showSearchResults(query) {
+            currentMode = 'search';
+            currentSearchQuery = query;
+            const results = searchByOEM(query);
+            renderPopular(results);
+            popularTitle.textContent = `Результаты поиска по «${escapeHtml(query)}» (${results.length})`;
+            catalogLink.classList.add('link-disabled');
+            if (showMoreBtn) showMoreBtn.style.display = 'none';
+            if (resetSearchBtn) resetSearchBtn.style.display = 'inline-block';
+        }
+
+        // Сброс к популярным товарам
+        function resetToPopular() {
+            currentMode = 'popular';
+            showMoreClicks = 0;
+            const initialItems = shuffle(popularSourceItems).slice(0, POPULAR_COUNT);
+            renderPopular(initialItems);
+            popularTitle.textContent = 'Популярные товары для Mercedes‑Benz';
+            catalogLink.classList.add('link-disabled');
+            if (showMoreBtn) {
+                showMoreBtn.style.display = 'inline-block';
+                showMoreBtn.textContent = 'Показать еще';
+            }
+            if (resetSearchBtn) resetSearchBtn.style.display = 'none';
+        }
+
+        // Загрузка данных и инициализация
+        async function init() {
             try {
-                const response = await fetch(POPULAR_FEED_URL, { cache: 'no-store' });
-                if (!response.ok) throw new Error(`Feed status: ${response.status}`);
+                const response = await fetch('./feed.csv', { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csvText = await response.text();
                 const parsed = parseFeed(csvText);
-                if (parsed.length >= POPULAR_COUNT) sourceItems = parsed;
+                if (parsed.length) {
+                    allParts = parsed;
+                    popularSourceItems = parsed; // используем все данные для популярных
+                } else {
+                    // Фолбек, если CSV пустой или не загрузился
+                    const fallback = [
+                        { name: 'A 270 180 00 09 (M270/M274)', category: 'Масляный фильтр', price: 1290, oem: 'A2701800009' },
+                        { name: 'A 005 420 59 20 (W205/W213)', category: 'Тормозные колодки', price: 3990, oem: 'A0054205920' },
+                        { name: 'A 205 320 07 30 (C‑Class W205)', category: 'Амортизатор (передний)', price: 5450, oem: 'A2053200730' },
+                        { name: 'A 000 982 96 08 (E‑Class/GLE)', category: 'АКБ AGM 80Ah', price: 7990, oem: 'A0009829608' },
+                    ];
+                    allParts = fallback;
+                    popularSourceItems = fallback;
+                }
             } catch (error) {
-                console.warn('Не удалось загрузить локальный CSV-фид, используем резервный набор.', error);
+                console.warn('Ошибка загрузки feed.csv, использую резервные данные', error);
+                const fallback = [
+                    { name: 'A 270 180 00 09 (M270/M274)', category: 'Масляный фильтр', price: 1290, oem: 'A2701800009' },
+                    { name: 'A 005 420 59 20 (W205/W213)', category: 'Тормозные колодки', price: 3990, oem: 'A0054205920' },
+                    { name: 'A 205 320 07 30 (C‑Class W205)', category: 'Амортизатор (передний)', price: 5450, oem: 'A2053200730' },
+                    { name: 'A 000 982 96 08 (E‑Class/GLE)', category: 'АКБ AGM 80Ah', price: 7990, oem: 'A0009829608' },
+                ];
+                allParts = fallback;
+                popularSourceItems = fallback;
             }
 
-            const nextItems = shuffle(sourceItems).slice(0, POPULAR_COUNT);
-            renderPopular(nextItems);
-
-            const showMoreBtn = document.getElementById('popular-show-more');
-            if (showMoreBtn) {
-                showMoreBtn.addEventListener('click', () => {
-                    const moreItems = shuffle(sourceItems).slice(0, POPULAR_COUNT);
-                    appendPopular(moreItems);
-                    showMoreClicks += 1;
-
-                    if (showMoreClicks >= SHOW_MORE_LIMIT) {
-                        showMoreBtn.outerHTML = '<button id="to-shop-btn" class="btn primary" type="button">В магазин</button>';
-                        const newShopBtn = document.getElementById('to-shop-btn');
-                        if (newShopBtn) {
-                            newShopBtn.addEventListener('click', () => alert('Переход в каталог магазина (демо)'));
-                        }
-                        return;
-                    }
-                    showMoreBtn.textContent = 'Показать еще';
-                });
-            }
+            // Показываем начальные популярные товары
+            const initialItems = shuffle(popularSourceItems).slice(0, POPULAR_COUNT);
+            renderPopular(initialItems);
         }
 
-        setupPopularRotation();
+        // Обработчики
+        if (searchForm) {
+            searchForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const query = searchInput.value.trim();
+                if (!query) {
+                    alert('Введите VIN или номер детали для поиска');
+                    return;
+                }
+                showSearchResults(query);
+            });
+        }
+
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener('click', () => {
+                if (currentMode !== 'popular') return;
+                const moreItems = shuffle(popularSourceItems).slice(0, POPULAR_COUNT);
+                appendPopular(moreItems);
+                showMoreClicks += 1;
+                if (showMoreClicks >= SHOW_MORE_LIMIT) {
+                    showMoreBtn.outerHTML = '<button id="to-shop-btn" class="btn primary" type="button">В магазин</button>';
+                    const newShopBtn = document.getElementById('to-shop-btn');
+                    if (newShopBtn) newShopBtn.addEventListener('click', () => alert('Переход в каталог магазина (демо)'));
+                }
+            });
+        }
+
+        if (resetSearchBtn) {
+            resetSearchBtn.addEventListener('click', () => {
+                resetToPopular();
+            });
+        }
+
+        init();
     </script>
 </body>
 </html>
