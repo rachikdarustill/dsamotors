@@ -119,6 +119,20 @@
         .btn:hover {
             filter: brightness(0.98);
         }
+        .header-phone {
+            font-weight: 600;
+            background: var(--bg);
+            padding: 8px 14px;
+            border-radius: 30px;
+            border: 1px solid var(--muted);
+            transition: all 0.2s;
+            color: var(--primary);
+        }
+        .header-phone:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
 
         /* Hero */
         .hero {
@@ -398,6 +412,7 @@
             .actions .btn { padding: 8px 10px; }
             .brand-name { font-size: 20px; }
             .header-logo { width: 44px; height: 44px; }
+            .header-phone { padding: 5px 10px; font-size: 14px; }
         }
 
         /* Announcement */
@@ -449,6 +464,7 @@
             <a class="header-logo" href="#" aria-label="DSA логотип">
                 <img src="./logo.png" alt="DSA логотип">
             </a>
+            <a href="tel:89000013023" class="header-phone">8 (900) 001-30-23</a>
         </div>
     </header>
 
@@ -616,7 +632,7 @@
                 <span class="non-clickable">Поддержка</span>
                 <span class="non-clickable">Личный кабинет</span>
             </div>
-            <!-- Контакты остаются кликабельными (не по заданию) -->
+            <!-- Контакты остаются кликабельными -->
             <div class="footer-col">
                 <h5>Контакты</h5>
                 <a href="mailto:support@dsamotors.com">support@dsamotors.com</a>
@@ -638,7 +654,7 @@
         const yearEl = document.getElementById('year');
         if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-        // Поиск (без изменений)
+        // Поиск
         const searchForm = document.getElementById('search');
         if (searchForm) {
             searchForm.addEventListener('submit', function (e) {
@@ -787,10 +803,9 @@
             popularGrid.insertAdjacentHTML('beforeend', renderPopularCards(items));
         }
 
-        // Обработчик для кнопок "В корзину" (простой алерт для демонстрации, что кнопки работают)
+        // Обработчик для кнопок "В корзину"
         function bindAddToCartButtons() {
             document.querySelectorAll('.add-btn').forEach(btn => {
-                // Убираем дублирование обработчиков
                 if (btn.dataset.listenerAdded) return;
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -825,7 +840,7 @@
                 showMoreBtn.addEventListener('click', () => {
                     const moreItems = shuffle(sourceItems).slice(0, POPULAR_COUNT);
                     appendPopular(moreItems);
-                    bindAddToCartButtons(); // привязываем обработчики к новым кнопкам
+                    bindAddToCartButtons();
                     showMoreClicks += 1;
 
                     if (showMoreClicks >= SHOW_MORE_LIMIT) {
