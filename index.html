@@ -166,7 +166,7 @@
             padding: 10px;
             box-shadow: 0 6px 18px rgba(8,170,243,0.08);
         }
-        .search input, .search select {
+        .search input {
             flex: 1;
             padding: 12px 12px;
             border: 1px solid var(--muted);
@@ -481,19 +481,6 @@
                 <p>Поиск по VIN Mercedes или номеру детали. Подбор для популярных серий — от C‑Class и E‑Class до GLE и Sprinter. Быстрая доставка по всей России.</p>
                 <form id="search" class="search" action="#" role="search" aria-label="Поиск запчастей">
                     <input type="text" name="q" id="searchInput" placeholder="VIN Mercedes / номер детали" aria-label="VIN Mercedes или номер детали">
-                    <select aria-label="Марка" disabled>
-                        <option value="Mercedes-Benz">Mercedes‑Benz</option>
-                    </select>
-                    <select aria-label="Модель" name="model">
-                        <option value="">Модель (серия)</option>
-                        <option value="c-class-w205">C‑Class (W205/W206)</option>
-                        <option value="e-class-w213">E‑Class (W212/W213)</option>
-                        <option value="s-class-w223">S‑Class (W221/W222/W223)</option>
-                        <option value="glc-x253">GLC (X253/X254)</option>
-                        <option value="gle-w167">GLE (W166/W167)</option>
-                        <option value="gla-h247">GLA (H247)</option>
-                        <option value="sprinter-w906">Sprinter (W906/W907)</option>
-                    </select>
                     <button type="submit">Найти запчасти</button>
                 </form>
             </div>
@@ -730,7 +717,6 @@
 
             const headers = rows[0].map((h) => h.toLowerCase().replace(/^["']|["']$/g, ''));
             // Определяем индексы: Title (D) -> 4-й столбец (индекс 3), OEM (N) -> 14-й столбец (индекс 13)
-            // Но также ищем по именам столбцов
             let titleIndex = headers.findIndex(h => /title|наименование|name/.test(h));
             let oemIndex = headers.findIndex(h => /oem|артикул|partnumber/.test(h));
             let categoryIndex = headers.findIndex(h => /category|категор/.test(h));
@@ -842,9 +828,9 @@
                 const parsed = parseFeed(csvText);
                 if (parsed.length) {
                     allParts = parsed;
-                    popularSourceItems = parsed; // используем все данные для популярных
+                    popularSourceItems = parsed;
                 } else {
-                    // Фолбек, если CSV пустой или не загрузился
+                    // Фолбек
                     const fallback = [
                         { name: 'A 270 180 00 09 (M270/M274)', category: 'Масляный фильтр', price: 1290, oem: 'A2701800009' },
                         { name: 'A 005 420 59 20 (W205/W213)', category: 'Тормозные колодки', price: 3990, oem: 'A0054205920' },
@@ -866,7 +852,6 @@
                 popularSourceItems = fallback;
             }
 
-            // Показываем начальные популярные товары
             const initialItems = shuffle(popularSourceItems).slice(0, POPULAR_COUNT);
             renderPopular(initialItems);
         }
