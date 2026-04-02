@@ -236,6 +236,10 @@
             border-radius: 12px;
             padding: 14px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: default;
+            display: block;
+            text-decoration: none;
+            color: inherit;
         }
         .product-image {
             width: 100%;
@@ -285,6 +289,10 @@
             color: var(--white);
             cursor: pointer;
             font-weight: 600;
+            transition: 0.1s ease;
+        }
+        .add-btn:hover {
+            filter: brightness(0.96);
         }
         .popular-more {
             display: flex;
@@ -346,10 +354,22 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+        .footer-col .non-clickable {
+            display: block;
+            padding: 6px 0;
+            color: var(--text);
+            cursor: default;
+            text-decoration: none;
+            pointer-events: none;
+        }
         .footer-col a {
             display: block;
             padding: 6px 0;
             color: var(--text);
+            text-decoration: none;
+        }
+        .footer-col a:hover {
+            color: var(--primary);
         }
         .copyright {
             border-top: 1px solid var(--muted);
@@ -482,31 +502,33 @@
     </section>
 
     <main>
+        <!-- Секция Категории запчастей (карточки теперь некликабельные, без href) -->
         <section id="categories" class="section container">
             <div class="section-header">
                 <h2 class="section-title">Категории запчастей Mercedes‑Benz</h2>
                 <a class="link" href="#">Смотреть все</a>
             </div>
             <div class="grid">
-                <a class="card" href="#">
+                <div class="card">
                     <div class="pill">Двигатель (M‑серии)</div>
                     <div class="product-title">Фильтры, ремни, свечи, насосы для M274/M276</div>
-                </a>
-                <a class="card" href="#">
+                </div>
+                <div class="card">
                     <div class="pill">Тормозная система</div>
                     <div class="product-title">Диски, колодки, датчики износа для W205/W213</div>
-                </a>
-                <a class="card" href="#">
+                </div>
+                <div class="card">
                     <div class="pill">Подвеска и рулевое</div>
                     <div class="product-title">AIRMATIC, амортизаторы, рычаги, рулевые наконечники</div>
-                </a>
-                <a class="card" href="#">
+                </div>
+                <div class="card">
                     <div class="pill">Электрика и датчики</div>
                     <div class="product-title">АКБ AGM, стартеры, генераторы, лямбда‑зонды</div>
-                </a>
+                </div>
             </div>
         </section>
 
+        <!-- Секция Популярные товары (карточки без обертки-ссылки, только div, кнопка работает) -->
         <section id="popular" class="section container">
             <div class="section-header">
                 <h2 class="section-title">Популярные товары для Mercedes‑Benz</h2>
@@ -578,20 +600,23 @@
                 </div>
                 <p style="margin:0;color:#6a6c6d;">Интернет-магазин запчастей для Mercedes‑Benz.</p>
             </div>
+            <!-- Категории в футере: все ссылки заменены на некликабельные span -->
             <div class="footer-col">
                 <h5>Категории</h5>
-                <a href="#">Двигатель (M‑серии)</a>
-                <a href="#">Тормозная система</a>
-                <a href="#">Подвеска и рулевое</a>
-                <a href="#">Электрика и датчики</a>
+                <span class="non-clickable">Двигатель (M‑серии)</span>
+                <span class="non-clickable">Тормозная система</span>
+                <span class="non-clickable">Подвеска и рулевое</span>
+                <span class="non-clickable">Электрика и датчики</span>
             </div>
+            <!-- Покупателям: все ссылки заменены на некликабельные span -->
             <div class="footer-col">
                 <h5>Покупателям</h5>
-                <a href="#">Доставка и оплата</a>
-                <a href="#">Гарантия и возврат</a>
-                <a href="#">Поддержка</a>
-                <a href="#">Личный кабинет</a>
+                <span class="non-clickable">Доставка и оплата</span>
+                <span class="non-clickable">Гарантия и возврат</span>
+                <span class="non-clickable">Поддержка</span>
+                <span class="non-clickable">Личный кабинет</span>
             </div>
+            <!-- Контакты остаются кликабельными (не по заданию) -->
             <div class="footer-col">
                 <h5>Контакты</h5>
                 <a href="mailto:support@dsamotors.com">support@dsamotors.com</a>
@@ -609,10 +634,11 @@
     </a>
 
     <script>
-        // Небольшая интерактивность без зависимостей
+        // Год в копирайте
         const yearEl = document.getElementById('year');
         if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+        // Поиск (без изменений)
         const searchForm = document.getElementById('search');
         if (searchForm) {
             searchForm.addEventListener('submit', function (e) {
@@ -623,6 +649,7 @@
             });
         }
 
+        // --- Данные и рендер для популярных товаров (карточки НЕ ссылки, только div, кнопка работает) ---
         const POPULAR_FEED_URL = './feed.csv';
         const POPULAR_COUNT = 8;
 
@@ -651,7 +678,7 @@
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+                .replace(/'/g, '&#39;');
         }
 
         function extractPrimaryImage(rawValue) {
@@ -732,16 +759,20 @@
             return copy;
         }
 
+        // Отрисовка карточек без <a>, только <div class="card">, кнопка остается кликабельной
         function renderPopularCards(items) {
-            return items.map((item) => `
-                <a class="card" href="${escapeHtml(item.url || '#')}" target="_blank" rel="noopener noreferrer">
-                    ${item.image ? `<img class="product-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name || 'Изображение товара')}" loading="lazy">` : ''}
-                    <div class="pill">${escapeHtml(item.category || 'Запчасть')}</div>
-                    <div class="product-title">${escapeHtml(item.name || 'Деталь Mercedes‑Benz')}</div>
-                    <div><span class="price">${formatRub(item.price)}</span></div>
-                    <button class="add-btn" type="button">В корзину</button>
-                </a>
-            `).join('');
+            return items.map((item) => {
+                const imageHtml = item.image ? `<img class="product-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name || 'Изображение товара')}" loading="lazy">` : '';
+                return `
+                    <div class="card">
+                        ${imageHtml}
+                        <div class="pill">${escapeHtml(item.category || 'Запчасть')}</div>
+                        <div class="product-title">${escapeHtml(item.name || 'Деталь Mercedes‑Benz')}</div>
+                        <div><span class="price">${formatRub(item.price)}</span></div>
+                        <button class="add-btn" type="button" data-item="${escapeHtml(item.name)}">В корзину</button>
+                    </div>
+                `;
+            }).join('');
         }
 
         function renderPopular(items) {
@@ -754,6 +785,20 @@
             const popularGrid = document.getElementById('popular-grid');
             if (!popularGrid) return;
             popularGrid.insertAdjacentHTML('beforeend', renderPopularCards(items));
+        }
+
+        // Обработчик для кнопок "В корзину" (простой алерт для демонстрации, что кнопки работают)
+        function bindAddToCartButtons() {
+            document.querySelectorAll('.add-btn').forEach(btn => {
+                // Убираем дублирование обработчиков
+                if (btn.dataset.listenerAdded) return;
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const itemName = btn.getAttribute('data-item') || 'товар';
+                    alert(`🛒 ${itemName} добавлен в корзину (демо-режим)`);
+                });
+                btn.dataset.listenerAdded = 'true';
+            });
         }
 
         async function setupPopularRotation() {
@@ -773,16 +818,22 @@
 
             const nextItems = shuffle(sourceItems).slice(0, POPULAR_COUNT);
             renderPopular(nextItems);
+            bindAddToCartButtons();
 
             const showMoreBtn = document.getElementById('popular-show-more');
             if (showMoreBtn) {
                 showMoreBtn.addEventListener('click', () => {
                     const moreItems = shuffle(sourceItems).slice(0, POPULAR_COUNT);
                     appendPopular(moreItems);
+                    bindAddToCartButtons(); // привязываем обработчики к новым кнопкам
                     showMoreClicks += 1;
 
                     if (showMoreClicks >= SHOW_MORE_LIMIT) {
                         showMoreBtn.outerHTML = '<button id="to-shop-btn" class="btn primary" type="button">В магазин</button>';
+                        const newShopBtn = document.getElementById('to-shop-btn');
+                        if (newShopBtn) {
+                            newShopBtn.addEventListener('click', () => alert('Переход в каталог магазина (демо)'));
+                        }
                         return;
                     }
                     showMoreBtn.textContent = 'Показать еще';
