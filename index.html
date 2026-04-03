@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#08AAF3">
     <title>DSA | Запчасти для Mercedes-Benz</title>
     <meta name="description" content="DSA — магазин оригинальных и аналоговых запчастей для Mercedes-Benz. Поиск по VIN, широкий выбор, быстрая доставка.">
     <link rel="icon" href="./logo.png" type="image/png">
@@ -20,6 +21,9 @@
             box-sizing: border-box;
         }
 
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
         html, body {
             margin: 0;
             padding: 0;
@@ -51,7 +55,7 @@
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 16px;
+            padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right));
         }
 
         /* Header */
@@ -66,8 +70,9 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
-            padding: 12px 0;
+            gap: 12px;
+            padding: max(10px, env(safe-area-inset-top)) 0 12px;
+            min-height: calc(52px + env(safe-area-inset-top));
         }
         .header-logo {
             display: inline-flex;
@@ -145,6 +150,11 @@
             border: 1px solid var(--muted);
             transition: all 0.2s;
             color: var(--primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
         }
         .header-phone:hover {
             background: var(--primary);
@@ -163,6 +173,9 @@
             align-items: center;
             gap: 24px;
             padding: 48px 0;
+        }
+        .hero-inner > div:first-child {
+            min-width: 0;
         }
         .hero h1 {
             margin: 0 0 12px 0;
@@ -202,6 +215,8 @@
             color: var(--white);
             cursor: pointer;
             font-weight: 600;
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
         }
         .search button:hover { filter: brightness(0.98); }
 
@@ -397,7 +412,7 @@
         }
         .copyright {
             border-top: 1px solid var(--muted);
-            padding: 14px 0;
+            padding: 14px 0 max(14px, env(safe-area-inset-bottom));
             font-size: 13px;
             color: #6a6c6d;
             text-align: center;
@@ -414,15 +429,57 @@
         @media (min-width: 820px) {
             .nav { display: flex; }
         }
+        @media (max-width: 640px) {
+            .hero-inner { padding: 28px 0 32px; gap: 18px; }
+            .hero h1 { font-size: clamp(22px, 6.5vw, 32px); }
+            .hero-stats {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .stat {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                text-align: left;
+                padding: 12px 14px;
+            }
+            .stat strong { font-size: 17px; }
+            .stat span {
+                font-size: 12px;
+                text-align: right;
+                max-width: 58%;
+            }
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .section { padding: 22px 0; }
+        }
         @media (max-width: 560px) {
             .grid { grid-template-columns: 1fr; }
             .benefits { grid-template-columns: 1fr; }
             .footer-inner { grid-template-columns: 1fr; }
-            .search { flex-direction: column; }
+            .search { flex-direction: column; align-items: stretch; }
+            .search input { min-height: 48px; font-size: 16px; }
+            .search button { width: 100%; }
             .actions .btn { padding: 8px 10px; }
             .brand-name { font-size: 20px; }
             .header-logo { width: 44px; height: 44px; }
-            .header-phone { padding: 5px 10px; font-size: 14px; }
+            .header-phone { padding: 8px 12px; font-size: 14px; flex: 1; max-width: 100%; justify-content: center; }
+            .popular-more {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .popular-more .btn {
+                width: 100%;
+                min-height: 48px;
+                font-size: 15px;
+            }
+            .card { padding: 16px; }
+            .product-title { font-size: 15px; line-height: 1.35; }
         }
 
         /* Announcement */
@@ -436,6 +493,8 @@
             text-align: center;
             font-weight: 700;
             letter-spacing: 0.2px;
+            line-height: 1.35;
+            font-size: clamp(13px, 3.4vw, 16px);
         }
 
         /* Corner Logo */
@@ -460,8 +519,8 @@
         }
         @media (max-width: 560px) {
             .corner-logo {
-                right: 12px;
-                bottom: 12px;
+                right: max(12px, env(safe-area-inset-right));
+                bottom: max(12px, env(safe-area-inset-bottom));
                 width: 52px;
                 height: 52px;
             }

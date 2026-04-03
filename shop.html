@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#08AAF3">
   <title>DSA | Каталог</title>
   <meta name="description" content="Каталог товаров DSA Motors — запчасти для Mercedes‑Benz из Японии.">
   <link rel="icon" href="./logo.png" type="image/png">
@@ -17,6 +18,7 @@
     }
 
     * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
     html, body {
       margin: 0;
       padding: 0;
@@ -48,7 +50,7 @@
       width: 100%;
       max-width: 1200px;
       margin: 0 auto;
-      padding: 0 16px;
+      padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right));
     }
 
     /* Header */
@@ -63,8 +65,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      padding: 12px 0;
+      gap: 12px;
+      padding: max(10px, env(safe-area-inset-top)) 0 12px;
+      min-height: calc(52px + env(safe-area-inset-top));
     }
     .header-logo {
       display: inline-flex;
@@ -90,6 +93,11 @@
       transition: all 0.2s;
       color: var(--primary);
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
     }
     .header-phone:hover {
       background: var(--primary);
@@ -97,7 +105,7 @@
       border-color: var(--primary);
     }
 
-    .page { padding: 18px 0 28px; }
+    .page { padding: 18px 0 max(28px, env(safe-area-inset-bottom)); }
 
     .section-header {
       display: flex;
@@ -149,6 +157,8 @@
       color: var(--white);
       cursor: pointer;
       font-weight: 700;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
     }
     .search button:hover { filter: brightness(0.98); }
     .filter-panel {
@@ -263,6 +273,11 @@
       color: var(--text);
       cursor: pointer;
       font-weight: 750;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn.primary {
       background: var(--primary);
@@ -284,12 +299,27 @@
       .grid { grid-template-columns: repeat(2, 1fr); }
       .toolbar { grid-template-columns: 1fr; }
     }
+    @media (max-width: 640px) {
+      .section-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .section-header .btn { width: 100%; }
+    }
     @media (max-width: 560px) {
       .grid { grid-template-columns: 1fr; }
       .header-logo { width: 44px; height: 44px; }
-      .header-phone { padding: 5px 10px; font-size: 14px; }
-      .search { flex-direction: column; }
+      .header-phone { padding: 8px 12px; font-size: 14px; flex: 1; justify-content: center; }
+      .search { flex-direction: column; align-items: stretch; }
+      .search input { min-height: 48px; font-size: 16px; }
+      .search button { width: 100%; }
       .filters { grid-template-columns: 1fr; }
+      .filters-actions { flex-direction: column; }
+      .filters-actions .btn { width: 100%; }
+      .card { padding: 16px; }
+      .product-title { font-size: 15px; line-height: 1.35; }
+      .controls .btn { width: 100%; min-height: 48px; font-size: 15px; }
     }
 
     /* Reinforce pointer after component rules (e.g. .card) */
