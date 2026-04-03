@@ -74,14 +74,15 @@
             padding: max(10px, env(safe-area-inset-top)) 0 12px;
             min-height: calc(52px + env(safe-area-inset-top));
         }
-        .header-actions {
+        .header-left {
             display: flex;
-            align-items: right;
+            align-items: center;
             gap: 10px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            flex: 1;
             min-width: 0;
+            flex: 1;
+        }
+        .header-left .header-logo {
+            flex-shrink: 0;
         }
         .header-logo {
             display: inline-flex;
@@ -476,7 +477,13 @@
             .actions .btn { padding: 8px 10px; }
             .brand-name { font-size: 20px; }
             .header-logo { width: 44px; height: 44px; }
-            .header-phone { padding: 8px 12px; font-size: 14px; flex: 1; max-width: 100%; justify-content: center; }
+            .header-phone { padding: 8px 12px; font-size: 14px; justify-content: center; }
+            .header-left .header-phone,
+            .header-phone-tel {
+                flex: 1;
+                min-width: 0;
+                max-width: 100%;
+            }
             .popular-more {
                 flex-direction: column;
                 align-items: stretch;
@@ -547,13 +554,13 @@
 <body>
     <header class="topbar">
         <div class="container topbar-inner">
-            <a class="header-logo" href="#" aria-label="DSA логотип">
-                <img src="./logo.png" alt="DSA логотип">
-            </a>
-            <div class="header-actions">
+            <div class="header-left">
+                <a class="header-logo" href="#" aria-label="DSA логотип">
+                    <img src="./logo.png" alt="DSA логотип">
+                </a>
                 <a href="./shop.html" class="header-phone">магазин</a>
-                <a href="tel:89000013023" class="header-phone">8 (900) 001-30-23</a>
             </div>
+            <a href="tel:89000013023" class="header-phone header-phone-tel">8 (900) 001-30-23</a>
         </div>
     </header>
 
