@@ -1,11 +1,900 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSA Motors</title>
+    <title>DSA | Запчасти для Mercedes-Benz</title>
+    <meta name="description" content="DSA — магазин оригинальных и аналоговых запчастей для Mercedes-Benz. Поиск по VIN, широкий выбор, быстрая доставка.">
+    <style>
+        :root {
+            --primary: #08AAF3;
+            --text: #4B4C4D;
+            --white: #FEFEFE;
+            --bg: #F6F8FA;
+            --muted: #E6E8EA;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        a { color: inherit; text-decoration: none; }
+        img { max-width: 100%; display: block; }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Header */
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--muted);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .topbar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px 0;
+        }
+        .header-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            border-radius: 10px;
+            background: var(--white);
+            border: 1px solid var(--muted);
+        }
+        .header-logo img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .brand-mark {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--primary), #5fd3ff);
+            display: grid;
+            place-items: center;
+            color: var(--white);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .brand-name {
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--text);
+        }
+        .nav {
+            display: none;
+            gap: 20px;
+        }
+        .nav a {
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+        .nav a:hover {
+            background: var(--bg);
+        }
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--muted);
+            background: var(--white);
+            color: var(--text);
+            cursor: pointer;
+        }
+        .btn.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+        .btn:hover {
+            filter: brightness(0.98);
+        }
+        .header-phone {
+            font-weight: 600;
+            background: var(--bg);
+            padding: 8px 14px;
+            border-radius: 30px;
+            border: 1px solid var(--muted);
+            transition: all 0.2s;
+            color: var(--primary);
+        }
+        .header-phone:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        /* Hero */
+        .hero {
+            background: radial-gradient(1200px 400px at 70% -10%, rgba(8,170,243,0.25), transparent), var(--white);
+            border-bottom: 1px solid var(--muted);
+        }
+        .hero-inner {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            align-items: center;
+            gap: 24px;
+            padding: 48px 0;
+        }
+        .hero h1 {
+            margin: 0 0 12px 0;
+            font-size: clamp(28px, 4.2vw, 44px);
+            line-height: 1.15;
+            color: var(--text);
+        }
+        .hero p {
+            margin: 0 0 24px 0;
+            font-size: 16px;
+            color: #5b5d5e;
+        }
+        .search {
+            display: flex;
+            gap: 10px;
+            background: var(--white);
+            border: 1px solid var(--muted);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 6px 18px rgba(8,170,243,0.08);
+        }
+        .search input {
+            flex: 1;
+            padding: 12px 12px;
+            border: 1px solid var(--muted);
+            border-radius: 8px;
+            background: #FBFCFD;
+            color: var(--text);
+            min-width: 0;
+        }
+        .search button {
+            white-space: nowrap;
+            padding: 12px 18px;
+            border-radius: 8px;
+            border: 1px solid var(--primary);
+            background: var(--primary);
+            color: var(--white);
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .search button:hover { filter: brightness(0.98); }
+
+        .hero-card {
+            background: linear-gradient(180deg, #ffffff, #f3fbff);
+            border: 1px solid var(--muted);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .stat {
+            background: var(--white);
+            border: 1px solid var(--muted);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        .stat strong {
+            display: block;
+            color: var(--primary);
+            font-size: 18px;
+        }
+        .stat span {
+            color: #6a6c6d;
+            font-size: 12px;
+        }
+
+        /* Sections */
+        .section {
+            padding: 28px 0;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .link {
+            color: var(--primary);
+            cursor: pointer;
+        }
+        .link-disabled {
+            pointer-events: none;
+            opacity: 0.7;
+            cursor: default;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        .card {
+            background: var(--white);
+            border: 1px solid var(--muted);
+            border-radius: 12px;
+            padding: 14px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: default;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+        .product-image {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            border-radius: 10px;
+            object-fit: cover;
+            background: #f1f4f6;
+            border: 1px solid var(--muted);
+            margin-bottom: 10px;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(8,170,243,0.12);
+        }
+        .pill {
+            display: inline-block;
+            background: #E9F8FF;
+            color: var(--primary);
+            border: 1px solid #CDEFFF;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .product-title {
+            margin: 10px 0 6px 0;
+            font-weight: 700;
+        }
+        .price {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 16px;
+        }
+        .old-price {
+            color: #8e9091;
+            text-decoration: line-through;
+            margin-left: 8px;
+            font-weight: 500;
+        }
+        .popular-more {
+            display: flex;
+            justify-content: center;
+            margin-top: 14px;
+            gap: 12px;
+        }
+        .search-reset-btn {
+            background: #e2e6ea;
+            border-color: #cbd3da;
+            color: #2c3e50;
+        }
+
+        /* Benefits */
+        .benefits {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        .benefit {
+            display: flex;
+            gap: 12px;
+            background: var(--white);
+            border: 1px solid var(--muted);
+            border-radius: 12px;
+            padding: 14px;
+            align-items: center;
+        }
+        .benefit .icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #E9F8FF;
+            color: var(--primary);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+        }
+        .benefit h4 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+        }
+        .benefit p {
+            margin: 0;
+            font-size: 13px;
+            color: #6a6c6d;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 28px;
+            background: var(--white);
+            border-top: 1px solid var(--muted);
+        }
+        .footer-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            padding: 24px 0;
+        }
+        .footer-col h5 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #6a6c6d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .footer-col .non-clickable {
+            display: block;
+            padding: 6px 0;
+            color: var(--text);
+            cursor: default;
+            text-decoration: none;
+            pointer-events: none;
+        }
+        .footer-col a {
+            display: block;
+            padding: 6px 0;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .footer-col a:hover {
+            color: var(--primary);
+        }
+        .copyright {
+            border-top: 1px solid var(--muted);
+            padding: 14px 0;
+            font-size: 13px;
+            color: #6a6c6d;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 960px) {
+            .nav { display: none; }
+            .hero-inner { grid-template-columns: 1fr; }
+            .grid { grid-template-columns: repeat(2, 1fr); }
+            .benefits { grid-template-columns: repeat(2, 1fr); }
+            .footer-inner { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 820px) {
+            .nav { display: flex; }
+        }
+        @media (max-width: 560px) {
+            .grid { grid-template-columns: 1fr; }
+            .benefits { grid-template-columns: 1fr; }
+            .footer-inner { grid-template-columns: 1fr; }
+            .search { flex-direction: column; }
+            .actions .btn { padding: 8px 10px; }
+            .brand-name { font-size: 20px; }
+            .header-logo { width: 44px; height: 44px; }
+            .header-phone { padding: 5px 10px; font-size: 14px; }
+        }
+
+        /* Announcement */
+        .announcement {
+            background: var(--primary);
+            color: var(--white);
+            border-bottom: 1px solid #66d6ff;
+        }
+        .announcement .inner {
+            padding: 10px 0;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        /* Corner Logo */
+        .corner-logo {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            width: 64px;
+            height: 64px;
+            border-radius: 14px;
+            background: var(--white);
+            border: 1px solid var(--muted);
+            box-shadow: 0 10px 22px rgba(8,170,243,0.18);
+            display: grid;
+            place-items: center;
+            z-index: 60;
+        }
+        .corner-logo img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+        @media (max-width: 560px) {
+            .corner-logo {
+                right: 12px;
+                bottom: 12px;
+                width: 52px;
+                height: 52px;
+            }
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--white);
+            border-radius: 16px;
+            border: 1px solid var(--muted);
+            color: #6a6c6d;
+        }
+    </style>
 </head>
 <body>
-    <h1>Coming soon</h1>
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a class="header-logo" href="#" aria-label="DSA логотип">
+                <img src="./logo.png" alt="DSA логотип">
+            </a>
+            <a href="tel:89000013023" class="header-phone">8 (900) 001-30-23</a>
+        </div>
+    </header>
+
+    <section class="announcement" aria-label="Специальное предложение">
+        <div class="container inner">
+            Оригинальные автозапчасти на Мерседес из Японии
+        </div>
+    </section>
+
+    <section class="hero">
+        <div class="container hero-inner">
+            <div>
+                <h1>Оригинальные запчасти для Mercedes‑Benz</h1>
+                <p>Поиск по VIN Mercedes или номеру детали. Подбор для популярных серий — от C‑Class и E‑Class до GLE и Sprinter. Быстрая доставка по всей России.</p>
+                <form id="search" class="search" action="#" role="search" aria-label="Поиск запчастей">
+                    <input type="text" name="q" id="searchInput" placeholder="VIN Mercedes / номер детали" aria-label="VIN Mercedes или номер детали">
+                    <button type="submit">Найти запчасти</button>
+                </form>
+            </div>
+            <aside class="hero-card" aria-label="Быстрая информация">
+                <div class="pill">Сервис DSA</div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <strong></strong>
+                        <span>4000+ Позиций на складе</span>
+                    </div>
+                    <div class="stat">
+                        <strong></strong>
+                        <span>Средняя доставка 24 часа</span>
+                    </div>
+                    <div class="stat">
+                        <strong>★</strong>
+                        <span>Рейтинг клиентов 5</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <main>
+        <section id="categories" class="section container">
+            <div class="section-header">
+                <h2 class="section-title">Категории запчастей Mercedes‑Benz</h2>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <div class="pill">Кузов</div>
+                    <div class="product-title">Подкрылки, защита бампера, крылья, капот, задние стекла, потолки</div>
+                </div>
+                <div class="card">
+                    <div class="pill">Электрооборудование</div>
+                    <div class="product-title">Камеры заднего вида, блоки управления, стеклоподъемники, бачки омывателя с подогревом</div>
+                </div>
+                <div class="card">
+                    <div class="pill">Тормозная система</div>
+                    <div class="product-title">Тормозные шланги, тормозные трубки, тормозные колодки</div>
+                </div>
+                <div class="card">
+                    <div class="pill">Подвеска</div>
+                    <div class="product-title">Амортизаторы с системой ADS, стабилизаторы поперечной устойчивости</div>
+                </div>
+                <div class="card">
+                    <div class="pill">Другое</div>
+                    <div class="product-title">Амортизаторы, тормозные суппорты, трубки тормозные, климатические блоки, крышки двигателя, стабилизаторы, блоки управления камерой</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="popular" class="section container">
+            <div class="section-header" id="popularHeader">
+                <h2 class="section-title" id="popularTitle">Популярные товары для Mercedes‑Benz</h2>
+                <span id="catalogLink" class="link link-disabled" aria-disabled="true">Каталог</span>
+            </div>
+            <div class="grid" id="popular-grid" aria-live="polite"></div>
+            <div class="popular-more" id="popularControls">
+                <button id="popular-show-more" class="btn primary" type="button">Показать еще</button>
+                <button id="resetSearchBtn" class="btn search-reset-btn" type="button" style="display: none;">Вернуть популярные</button>
+            </div>
+        </section>
+
+        <section id="benefits" class="section container">
+            <div class="section-header">
+                <h2 class="section-title">Почему выбирают DSA</h2>
+            </div>
+            <div class="benefits">
+                <div class="benefit">
+                    <div class="icon">✓</div>
+                    <div>
+                        <h4>Гарантия соответствия</h4>
+                        <p>Подбор по VIN снижает риск ошибки и возвратов.</p>
+                    </div>
+                </div>
+                <div class="benefit">
+                    <div class="icon">⚡</div>
+                    <div>
+                        <h4>Быстрая доставка</h4>
+                        <p>По стране и в пункты самовывоза — от 24 часов.</p>
+                    </div>
+                </div>
+                <div class="benefit">
+                    <div class="icon">💬</div>
+                    <div>
+                        <h4>Экспертная поддержка</h4>
+                        <p>Поможем с подбором и оформлением заказа.</p>
+                    </div>
+                </div>
+                <div class="benefit">
+                    <div class="icon">💳</div>
+                    <div>
+                        <h4>Удобная оплата</h4>
+                        <p>Онлайн-оплата, наложенный платеж и безналичный расчет.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section container" id="contacts">
+            <div class="section-header">
+                <h2 class="section-title">Остались вопросы?</h2>
+            </div>
+            <div class="card">
+                <p>Оригинальные автозапчасти на Мерседес из Японии. По всем вопросам звоните:</p>
+                <ul style="margin:8px 0 0 18px; padding:0; line-height:1.9;">
+                    <li><a class="link" href="tel:89000013023">89000013023</a></li>
+                    <li><a class="link" href="tel:89385333048">89385333048</a></li>
+                    <li><a class="link" href="tel:89000031339">89000031339</a></li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-inner">
+            <div class="footer-col">
+                <div class="brand" style="margin-bottom:10px;">
+                    <div class="brand-mark">DSA</div>
+                    <div class="brand-name">DSA Motors</div>
+                </div>
+                <p style="margin:0;color:#6a6c6d;">Интернет-магазин запчастей для Mercedes‑Benz.</p>
+            </div>
+            <div class="footer-col">
+                <h5>Категории</h5>
+                <span class="non-clickable">Двигатель (M‑серии)</span>
+                <span class="non-clickable">Тормозная система</span>
+                <span class="non-clickable">Подвеска и рулевое</span>
+                <span class="non-clickable">Электрика и датчики</span>
+            </div>
+            <div class="footer-col">
+                <h5>Покупателям</h5>
+                <span class="non-clickable">Доставка и оплата</span>
+                <span class="non-clickable">Гарантия и возврат</span>
+                <span class="non-clickable">Поддержка</span>
+                <span class="non-clickable">Личный кабинет</span>
+            </div>
+            <div class="footer-col">
+                <h5>Контакты</h5>
+                <a href="mailto:support@dsamotors.com">support@dsamotors.com</a>
+                <a href="tel:89000013023">+7 (900) 001-30-23</a>
+            </div>
+        </div>
+        <div class="copyright">
+            © <span id="year"></span> DSA. Все права защищены.
+        </div>
+    </footer>
+
+    <a href="#" class="corner-logo" aria-label="DSA логотип Mercedes">
+        <img src="./logo.png" alt="DSA логотип Mercedes">
+    </a>
+
+    <script>
+        // Глобальные переменные
+        let allParts = [];           // все детали из CSV (с полями name, category, price, image, oem)
+        let popularSourceItems = []; // исходный список для популярных товаров (после загрузки)
+        let currentMode = 'popular'; // 'popular' или 'search'
+        let currentSearchQuery = '';
+        let showMoreClicks = 0;
+        const SHOW_MORE_LIMIT = 10;
+        const POPULAR_COUNT = 8;
+
+        // DOM элементы
+        const yearEl = document.getElementById('year');
+        const searchForm = document.getElementById('search');
+        const searchInput = document.getElementById('searchInput');
+        const popularGrid = document.getElementById('popular-grid');
+        const popularTitle = document.getElementById('popularTitle');
+        const catalogLink = document.getElementById('catalogLink');
+        const showMoreBtn = document.getElementById('popular-show-more');
+        const resetSearchBtn = document.getElementById('resetSearchBtn');
+
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+        // Вспомогательные функции
+        function formatRub(value) {
+            return `${Math.round(Number(value) || 0).toLocaleString('ru-RU')} ₽`;
+        }
+
+        function escapeHtml(text) {
+            return String(text || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function extractPrimaryImage(rawValue) {
+            if (!rawValue) return '';
+            const candidates = String(rawValue)
+                .split(/[|;,]/)
+                .map((part) => part.trim())
+                .filter(Boolean);
+            return candidates[0] || '';
+        }
+
+        // Парсинг CSV с поддержкой OEM (столбец N) и Title (столбец D)
+        function parseFeed(csvText) {
+            const rows = [];
+            const text = csvText.replace(/^\uFEFF/, '');
+            let current = '';
+            let row = [];
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i += 1) {
+                const ch = text[i];
+                const next = text[i + 1];
+
+                if (ch === '"') {
+                    if (inQuotes && next === '"') {
+                        current += '"';
+                        i += 1;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (ch === ',' && !inQuotes) {
+                    row.push(current.trim());
+                    current = '';
+                } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+                    if (ch === '\r' && next === '\n') i += 1;
+                    row.push(current.trim());
+                    if (row.some((cell) => cell.length > 0)) rows.push(row);
+                    row = [];
+                    current = '';
+                } else {
+                    current += ch;
+                }
+            }
+            if (current.length > 0 || row.length > 0) {
+                row.push(current.trim());
+                rows.push(row);
+            }
+            if (!rows.length) return [];
+
+            const headers = rows[0].map((h) => h.toLowerCase().replace(/^["']|["']$/g, ''));
+            // Определяем индексы: Title (D) -> 4-й столбец (индекс 3), OEM (N) -> 14-й столбец (индекс 13)
+            let titleIndex = headers.findIndex(h => /title|наименование|name/.test(h));
+            let oemIndex = headers.findIndex(h => /oem|артикул|partnumber/.test(h));
+            let categoryIndex = headers.findIndex(h => /category|категор/.test(h));
+            let priceIndex = headers.findIndex(h => /price|цена/.test(h));
+            let imageIndex = headers.findIndex(h => h === 'images1' || /image1|изображ/.test(h));
+
+            // Если заголовки не найдены, используем позиции: D -> индекс 3, N -> индекс 13 (если колонок достаточно)
+            if (titleIndex === -1 && rows[0].length > 3) titleIndex = 3;
+            if (oemIndex === -1 && rows[0].length > 13) oemIndex = 13;
+            if (categoryIndex === -1 && rows[0].length > 2) categoryIndex = 2;
+            if (priceIndex === -1 && rows[0].length > 4) priceIndex = 4;
+            if (imageIndex === -1 && rows[0].length > 5) imageIndex = 5;
+
+            return rows.slice(1).map((cols, idx) => {
+                const rawTitle = (titleIndex >= 0 && cols[titleIndex]) ? cols[titleIndex] : (cols[0] || '');
+                const rawOEM = (oemIndex >= 0 && cols[oemIndex]) ? cols[oemIndex] : '';
+                const rawCategory = (categoryIndex >= 0 && cols[categoryIndex]) ? cols[categoryIndex] : 'Запчасть';
+                const rawPrice = (priceIndex >= 0 && cols[priceIndex]) ? cols[priceIndex] : '';
+                const rawImage = (imageIndex >= 0 && cols[imageIndex]) ? cols[imageIndex] : '';
+                const numericPrice = Number(String(rawPrice).replace(/[^\d.,]/g, '').replace(',', '.'));
+                return {
+                    id: idx,
+                    name: rawTitle || 'Деталь Mercedes‑Benz',
+                    category: rawCategory || 'Запчасть',
+                    price: Number.isFinite(numericPrice) ? numericPrice : 0,
+                    image: extractPrimaryImage(rawImage),
+                    oem: rawOEM,
+                };
+            }).filter(item => item.name);
+        }
+
+        function shuffle(arr) {
+            const copy = arr.slice();
+            for (let i = copy.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        // Рендер карточек (без кнопки корзины)
+        function renderCards(items) {
+            if (!items.length) {
+                return `<div class="no-results">🔍 По запросу «${escapeHtml(currentSearchQuery)}» ничего не найдено.<br>Попробуйте другой номер детали.</div>`;
+            }
+            return items.map((item) => {
+                const imgSrc = item.image ? escapeHtml(item.image) : './no-image.svg';
+                const imageHtml = `<img class="product-image" src="${imgSrc}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.onerror=null;this.src='./no-image.svg'">`;
+                const productHref = `./product.html?i=${encodeURIComponent(item.id ?? '')}`;
+                return `
+                    <a class="card" href="${productHref}" aria-label="Открыть товар: ${escapeHtml(item.name)}">
+                        ${imageHtml}
+                        <div class="pill">${escapeHtml(item.category)}</div>
+                        <div class="product-title">${escapeHtml(item.name)}</div>
+                        <div><span class="price">${formatRub(item.price)}</span></div>
+                        ${item.oem ? `<div style="font-size: 11px; color: #8e9091; margin-top: 6px;">OEM: ${escapeHtml(item.oem)}</div>` : ''}
+                    </a>
+                `;
+            }).join('');
+        }
+
+        function renderPopular(items) {
+            if (!popularGrid) return;
+            popularGrid.innerHTML = renderCards(items);
+        }
+
+        function appendPopular(items) {
+            if (!popularGrid) return;
+            popularGrid.insertAdjacentHTML('beforeend', renderCards(items));
+        }
+
+        // Поиск по OEM (столбец N)
+        function searchByOEM(query) {
+            if (!query.trim()) return [];
+            const lowerQuery = query.trim().toLowerCase();
+            return allParts.filter(item => item.oem && item.oem.toLowerCase().includes(lowerQuery));
+        }
+
+        // Показать результаты поиска
+        function showSearchResults(query) {
+            currentMode = 'search';
+            currentSearchQuery = query;
+            const results = searchByOEM(query);
+            renderPopular(results);
+            popularTitle.textContent = `Результаты поиска по «${escapeHtml(query)}» (${results.length})`;
+            catalogLink.classList.add('link-disabled');
+            if (showMoreBtn) showMoreBtn.style.display = 'none';
+            if (resetSearchBtn) resetSearchBtn.style.display = 'inline-block';
+        }
+
+        // Сброс к популярным товарам
+        function resetToPopular() {
+            currentMode = 'popular';
+            showMoreClicks = 0;
+            const initialItems = shuffle(popularSourceItems).slice(0, POPULAR_COUNT);
+            renderPopular(initialItems);
+            popularTitle.textContent = 'Популярные товары для Mercedes‑Benz';
+            catalogLink.classList.add('link-disabled');
+            if (showMoreBtn) {
+                showMoreBtn.style.display = 'inline-block';
+                showMoreBtn.textContent = 'Показать еще';
+            }
+            if (resetSearchBtn) resetSearchBtn.style.display = 'none';
+        }
+
+        // Загрузка данных и инициализация
+        async function init() {
+            try {
+                const response = await fetch('./feed.csv', { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const csvText = await response.text();
+                const parsed = parseFeed(csvText);
+                if (parsed.length) {
+                    allParts = parsed;
+                    popularSourceItems = parsed;
+                } else {
+                    // Фолбек
+                    const fallback = [
+                        { name: 'A 270 180 00 09 (M270/M274)', category: 'Масляный фильтр', price: 1290, oem: 'A2701800009' },
+                        { name: 'A 005 420 59 20 (W205/W213)', category: 'Тормозные колодки', price: 3990, oem: 'A0054205920' },
+                        { name: 'A 205 320 07 30 (C‑Class W205)', category: 'Амортизатор (передний)', price: 5450, oem: 'A2053200730' },
+                        { name: 'A 000 982 96 08 (E‑Class/GLE)', category: 'АКБ AGM 80Ah', price: 7990, oem: 'A0009829608' },
+                    ];
+                    allParts = fallback;
+                    popularSourceItems = fallback;
+                }
+            } catch (error) {
+                console.warn('Ошибка загрузки feed.csv, использую резервные данные', error);
+                const fallback = [
+                    { name: 'A 270 180 00 09 (M270/M274)', category: 'Масляный фильтр', price: 1290, oem: 'A2701800009' },
+                    { name: 'A 005 420 59 20 (W205/W213)', category: 'Тормозные колодки', price: 3990, oem: 'A0054205920' },
+                    { name: 'A 205 320 07 30 (C‑Class W205)', category: 'Амортизатор (передний)', price: 5450, oem: 'A2053200730' },
+                    { name: 'A 000 982 96 08 (E‑Class/GLE)', category: 'АКБ AGM 80Ah', price: 7990, oem: 'A0009829608' },
+                ];
+                allParts = fallback;
+                popularSourceItems = fallback;
+            }
+
+            const initialItems = shuffle(popularSourceItems).slice(0, POPULAR_COUNT);
+            renderPopular(initialItems);
+        }
+
+        // Обработчики
+        if (searchForm) {
+            searchForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const query = searchInput.value.trim();
+                if (!query) {
+                    alert('Введите VIN или номер детали для поиска');
+                    return;
+                }
+                showSearchResults(query);
+            });
+        }
+
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener('click', () => {
+                if (currentMode !== 'popular') return;
+                const moreItems = shuffle(popularSourceItems).slice(0, POPULAR_COUNT);
+                appendPopular(moreItems);
+                showMoreClicks += 1;
+                if (showMoreClicks >= SHOW_MORE_LIMIT) {
+                    showMoreBtn.outerHTML = '<button id="to-shop-btn" class="btn primary" type="button">В магазин</button>';
+                    const newShopBtn = document.getElementById('to-shop-btn');
+                    if (newShopBtn) newShopBtn.addEventListener('click', () => alert('Переход в каталог магазина (демо)'));
+                }
+            });
+        }
+
+        if (resetSearchBtn) {
+            resetSearchBtn.addEventListener('click', () => {
+                resetToPopular();
+            });
+        }
+
+        init();
+    </script>
 </body>
 </html>
