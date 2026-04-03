@@ -538,7 +538,7 @@
         <section id="popular" class="section container">
             <div class="section-header" id="popularHeader">
                 <h2 class="section-title" id="popularTitle">Популярные товары для Mercedes‑Benz</h2>
-                <span id="catalogLink" class="link link-disabled" aria-disabled="true">Каталог</span>
+                <a id="catalogLink" class="link" href="./shop.html">Каталог</a>
             </div>
             <div class="grid" id="popular-grid" aria-live="polite"></div>
             <div class="popular-more" id="popularControls">
@@ -885,7 +885,7 @@
                 if (showMoreClicks >= SHOW_MORE_LIMIT) {
                     showMoreBtn.outerHTML = '<button id="to-shop-btn" class="btn primary" type="button">В магазин</button>';
                     const newShopBtn = document.getElementById('to-shop-btn');
-                    if (newShopBtn) newShopBtn.addEventListener('click', () => alert('Переход в каталог магазина (демо)'));
+                    if (newShopBtn) newShopBtn.addEventListener('click', () => { window.location.href = './shop.html'; });
                 }
             });
         }
