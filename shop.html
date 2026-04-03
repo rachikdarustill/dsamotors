@@ -36,7 +36,8 @@
     label[for],
     summary,
     [role="button"]:not([aria-disabled="true"]),
-    [onclick] {
+    [onclick],
+    select {
       cursor: pointer;
     }
 
@@ -212,7 +213,6 @@
       border-radius: 12px;
       padding: 14px;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: default;
       display: block;
       text-decoration: none;
       color: inherit;
@@ -290,6 +290,14 @@
       .header-phone { padding: 5px 10px; font-size: 14px; }
       .search { flex-direction: column; }
       .filters { grid-template-columns: 1fr; }
+    }
+
+    /* Reinforce pointer after component rules (e.g. .card) */
+    a[href],
+    button:not(:disabled),
+    select,
+    a.card {
+      cursor: pointer;
     }
   </style>
 </head>
