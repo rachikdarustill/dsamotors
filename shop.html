@@ -95,6 +95,95 @@
       margin: 0;
     }
     .hint { color: #6a6c6d; font-size: 13px; }
+    .hint b { font-weight: 800; }
+
+    /* Filters / Search */
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 14px;
+      margin-bottom: 14px;
+      align-items: start;
+    }
+    .search {
+      display: flex;
+      gap: 10px;
+      background: var(--white);
+      border: 1px solid var(--muted);
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 6px 18px rgba(8,170,243,0.08);
+    }
+    .search input {
+      flex: 1;
+      padding: 12px 12px;
+      border: 1px solid var(--muted);
+      border-radius: 8px;
+      background: #FBFCFD;
+      color: var(--text);
+      min-width: 0;
+    }
+    .search button {
+      white-space: nowrap;
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--primary);
+      background: var(--primary);
+      color: var(--white);
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .search button:hover { filter: brightness(0.98); }
+    .filter-panel {
+      background: var(--white);
+      border: 1px solid var(--muted);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: #6a6c6d;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--muted);
+      border-radius: 10px;
+      background: #FBFCFD;
+      color: var(--text);
+      outline: none;
+    }
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(8,170,243,0.65);
+      box-shadow: 0 0 0 3px rgba(8,170,243,0.12);
+    }
+    .filters-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .btn.secondary {
+      background: #e2e6ea;
+      border-color: #cbd3da;
+      color: #2c3e50;
+    }
+    .summary {
+      margin: 10px 0 12px;
+      color: #6a6c6d;
+      font-size: 13px;
+    }
 
     .grid {
       display: grid;
@@ -177,11 +266,14 @@
 
     @media (max-width: 960px) {
       .grid { grid-template-columns: repeat(2, 1fr); }
+      .toolbar { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
       .grid { grid-template-columns: 1fr; }
       .header-logo { width: 44px; height: 44px; }
       .header-phone { padding: 5px 10px; font-size: 14px; }
+      .search { flex-direction: column; }
+      .filters { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -205,6 +297,54 @@
         <a class="btn" href="./index.html">На главную</a>
       </div>
 
+      <div class="toolbar" aria-label="Поиск и фильтры">
+        <form id="searchForm" class="search" action="#" role="search" aria-label="Поиск запчастей">
+          <input type="text" id="searchInput" placeholder="VIN Mercedes / номер детали" aria-label="VIN Mercedes или номер детали">
+          <button type="submit">Найти</button>
+        </form>
+
+        <div class="filter-panel" aria-label="Фильтры каталога">
+          <div class="filters">
+            <div class="field">
+              <label for="categorySelect">Категория</label>
+              <select id="categorySelect">
+                <option value="">Все</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="conditionSelect">Состояние</label>
+              <select id="conditionSelect">
+                <option value="">Все</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="minPrice">Цена от, ₽</label>
+              <input id="minPrice" type="number" min="0" step="1" placeholder="0">
+            </div>
+            <div class="field">
+              <label for="maxPrice">Цена до, ₽</label>
+              <input id="maxPrice" type="number" min="0" step="1" placeholder="∞">
+            </div>
+            <div class="field" style="grid-column: 1 / -1;">
+              <label for="sortSelect">Сортировка</label>
+              <select id="sortSelect">
+                <option value="default">По умолчанию</option>
+                <option value="priceAsc">Цена: по возрастанию</option>
+                <option value="priceDesc">Цена: по убыванию</option>
+                <option value="titleAsc">Название: А → Я</option>
+                <option value="titleDesc">Название: Я → А</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filters-actions">
+            <button id="resetBtn" class="btn secondary" type="button">Сбросить</button>
+            <button id="applyBtn" class="btn primary" type="button">Применить</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="summary" class="summary" aria-live="polite"></div>
       <div id="status" class="panel" style="display:none;"></div>
       <div class="grid" id="grid" aria-live="polite"></div>
 
@@ -220,8 +360,21 @@
     const gridEl = document.getElementById('grid');
     const showMoreBtn = document.getElementById('showMore');
     const statusEl = document.getElementById('status');
+    const summaryEl = document.getElementById('summary');
+
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+
+    const categorySelect = document.getElementById('categorySelect');
+    const conditionSelect = document.getElementById('conditionSelect');
+    const minPriceInput = document.getElementById('minPrice');
+    const maxPriceInput = document.getElementById('maxPrice');
+    const sortSelect = document.getElementById('sortSelect');
+    const applyBtn = document.getElementById('applyBtn');
+    const resetBtn = document.getElementById('resetBtn');
 
     let allItems = [];
+    let filteredItems = [];
     let shown = 0;
 
     function formatRub(value) {
@@ -287,6 +440,7 @@
       const titleIndex = Math.max(headers.findIndex(h => /title|наименование|name/.test(h)), 3);
       const oemIndex = Math.max(headers.findIndex(h => /^oem$|oem|артикул|partnumber/.test(h)), 13);
       const categoryIndex = Math.max(headers.findIndex(h => /category|категор/.test(h)), 0);
+      const conditionIndex = Math.max(headers.findIndex(h => /condition|состояни/.test(h)), 1);
       const priceIndex = Math.max(headers.findIndex(h => /price|цена/.test(h)), 10);
       const imageIndex = (() => {
         const idx = headers.findIndex(h => h === 'images1' || /^images1$/.test(h) || /image1|изображ/.test(h));
@@ -305,6 +459,7 @@
           id: idx,
           name: rawTitle || 'Деталь Mercedes‑Benz',
           category: rawCategory || 'Запчасть',
+          condition: (conditionIndex >= 0 && cols[conditionIndex]) ? cols[conditionIndex] : '',
           price: Number.isFinite(numericPrice) ? numericPrice : 0,
           image: extractPrimaryImage(rawImage),
           oem: rawOEM,
@@ -330,11 +485,20 @@
 
     function updateShowMoreVisibility() {
       if (!showMoreBtn) return;
-      const hasMore = shown < allItems.length;
+      const hasMore = shown < filteredItems.length;
       showMoreBtn.style.display = hasMore ? 'inline-block' : 'none';
       if (hasMore) {
-        showMoreBtn.textContent = `Показать ещё (${Math.min(BATCH_SIZE, allItems.length - shown)})`;
+        showMoreBtn.textContent = `Показать ещё (${Math.min(BATCH_SIZE, filteredItems.length - shown)})`;
       }
+    }
+
+    function setSummary() {
+      if (!summaryEl) return;
+      if (!allItems.length) {
+        summaryEl.textContent = '';
+        return;
+      }
+      summaryEl.innerHTML = `Найдено: <b>${filteredItems.length}</b> из <b>${allItems.length}</b>. Показано: <b>${Math.min(shown, filteredItems.length)}</b>.`;
     }
 
     function showStatus(html) {
@@ -350,10 +514,81 @@
     }
 
     function appendNextBatch() {
-      const next = allItems.slice(shown, shown + BATCH_SIZE);
+      const next = filteredItems.slice(shown, shown + BATCH_SIZE);
       shown += next.length;
       gridEl.insertAdjacentHTML('beforeend', renderCards(next));
       updateShowMoreVisibility();
+      setSummary();
+    }
+
+    function fillSelect(selectEl, values) {
+      if (!selectEl) return;
+      const current = selectEl.value;
+      const options = [''].concat(values);
+      selectEl.innerHTML = options.map((v) => {
+        const label = v === '' ? 'Все' : escapeHtml(v);
+        return `<option value="${escapeHtml(v)}">${label}</option>`;
+      }).join('');
+      if (options.includes(current)) selectEl.value = current;
+    }
+
+    function getTextHaystack(item) {
+      const parts = [
+        item.oem || '',
+        item.name || '',
+        item.category || '',
+        item.condition || '',
+      ];
+      return parts.join(' ').toLowerCase();
+    }
+
+    function applyFilters() {
+      const q = String((searchInput && searchInput.value) || '').trim().toLowerCase();
+      const cat = categorySelect ? String(categorySelect.value || '').trim() : '';
+      const cond = conditionSelect ? String(conditionSelect.value || '').trim() : '';
+
+      const minRaw = minPriceInput ? String(minPriceInput.value || '').trim() : '';
+      const maxRaw = maxPriceInput ? String(maxPriceInput.value || '').trim() : '';
+      const min = minRaw === '' ? null : Number(minRaw);
+      const max = maxRaw === '' ? null : Number(maxRaw);
+
+      let list = allItems.slice();
+
+      if (q) {
+        list = list.filter((item) => getTextHaystack(item).includes(q));
+      }
+      if (cat) {
+        list = list.filter((item) => String(item.category || '').trim() === cat);
+      }
+      if (cond) {
+        list = list.filter((item) => String(item.condition || '').trim() === cond);
+      }
+      if (min !== null && Number.isFinite(min)) {
+        list = list.filter((item) => Number(item.price || 0) >= min);
+      }
+      if (max !== null && Number.isFinite(max)) {
+        list = list.filter((item) => Number(item.price || 0) <= max);
+      }
+
+      const sortMode = sortSelect ? sortSelect.value : 'default';
+      if (sortMode === 'priceAsc') list.sort((a, b) => (a.price || 0) - (b.price || 0));
+      if (sortMode === 'priceDesc') list.sort((a, b) => (b.price || 0) - (a.price || 0));
+      if (sortMode === 'titleAsc') list.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ru'));
+      if (sortMode === 'titleDesc') list.sort((a, b) => String(b.name || '').localeCompare(String(a.name || ''), 'ru'));
+
+      filteredItems = list;
+      shown = 0;
+      gridEl.innerHTML = '';
+
+      if (!filteredItems.length) {
+        showStatus('<div class="error">Ничего не найдено по выбранным фильтрам. Попробуйте изменить запрос или нажмите «Сбросить».</div>');
+        updateShowMoreVisibility();
+        setSummary();
+        return;
+      }
+
+      hideStatus();
+      appendNextBatch();
     }
 
     async function init() {
@@ -371,13 +606,43 @@
         }
 
         allItems = parsed;
+        hideStatus();
+        // Заполняем фильтры
+        const categories = Array.from(new Set(allItems.map((x) => String(x.category || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru'));
+        const conditions = Array.from(new Set(allItems.map((x) => String(x.condition || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru'));
+        fillSelect(categorySelect, categories);
+        fillSelect(conditionSelect, conditions);
+
+        // Стартовый вывод: первые 200 (без фильтров)
+        filteredItems = allItems.slice();
         shown = 0;
         gridEl.innerHTML = '';
-        hideStatus();
-        appendNextBatch(); // первые 200
+        appendNextBatch();
 
         if (showMoreBtn) {
           showMoreBtn.addEventListener('click', appendNextBatch);
+        }
+        if (applyBtn) applyBtn.addEventListener('click', applyFilters);
+        if (resetBtn) {
+          resetBtn.addEventListener('click', () => {
+            if (searchInput) searchInput.value = '';
+            if (categorySelect) categorySelect.value = '';
+            if (conditionSelect) conditionSelect.value = '';
+            if (minPriceInput) minPriceInput.value = '';
+            if (maxPriceInput) maxPriceInput.value = '';
+            if (sortSelect) sortSelect.value = 'default';
+            filteredItems = allItems.slice();
+            shown = 0;
+            gridEl.innerHTML = '';
+            hideStatus();
+            appendNextBatch();
+          });
+        }
+        if (searchForm) {
+          searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            applyFilters();
+          });
         }
       } catch (e) {
         showStatus('<div class="error">Не удалось загрузить <b>feed.csv</b>. Проверьте, что файл лежит рядом с сайтом и страница открыта через сервер (а не напрямую из проводника).</div>');
