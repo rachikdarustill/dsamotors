@@ -605,28 +605,7 @@
             <div class="section-header">
                 <h2 class="section-title">Категории запчастей</h2>
             </div>
-            <div class="grid">
-                <div class="card">
-                    <div class="pill">Кузов</div>
-                    <div class="product-title">Подкрылки, защита бампера, крылья, капот, задние стекла, потолки</div>
-                </div>
-                <div class="card">
-                    <div class="pill">Электрооборудование</div>
-                    <div class="product-title">Камеры заднего вида, блоки управления, стеклоподъемники, бачки омывателя с подогревом</div>
-                </div>
-                <div class="card">
-                    <div class="pill">Тормозная система</div>
-                    <div class="product-title">Тормозные шланги, тормозные трубки, тормозные колодки</div>
-                </div>
-                <div class="card">
-                    <div class="pill">Подвеска</div>
-                    <div class="product-title">Амортизаторы с системой ADS, стабилизаторы поперечной устойчивости</div>
-                </div>
-                <div class="card">
-                    <div class="pill">Другое</div>
-                    <div class="product-title">Амортизаторы, тормозные суппорты, трубки тормозные, климатические блоки, крышки двигателя, стабилизаторы, блоки управления камерой</div>
-                </div>
-            </div>
+            <div class="grid" id="categories-grid" aria-live="polite"></div>
         </section>
 
         <section id="popular" class="section container">
@@ -742,6 +721,7 @@
         const yearEl = document.getElementById('year');
         const searchForm = document.getElementById('search');
         const searchInput = document.getElementById('searchInput');
+        const categoriesGrid = document.getElementById('categories-grid');
         const popularGrid = document.getElementById('popular-grid');
         const popularTitle = document.getElementById('popularTitle');
         const catalogLink = document.getElementById('catalogLink');
@@ -884,6 +864,34 @@
             popularGrid.insertAdjacentHTML('beforeend', renderCards(items));
         }
 
+        function renderCategories(items) {
+            if (!categoriesGrid) return;
+            const counts = new Map();
+            items.forEach((item) => {
+                const category = String(item.category || '').trim();
+                if (!category) return;
+                counts.set(category, (counts.get(category) || 0) + 1);
+            });
+
+            const categories = Array.from(counts.entries())
+                .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
+
+            if (!categories.length) {
+                categoriesGrid.innerHTML = '<div class="no-results">Категории не найдены.</div>';
+                return;
+            }
+
+            categoriesGrid.innerHTML = categories.map(([category, count]) => {
+                const href = `./shop.html?category=${encodeURIComponent(category)}`;
+                return `
+                    <a class="card" href="${href}" aria-label="Открыть категорию: ${escapeHtml(category)}">
+                        <div class="pill">${escapeHtml(category)}</div>
+                        <div class="product-title">${count.toLocaleString('ru-RU')} товаров</div>
+                    </a>
+                `;
+            }).join('');
+        }
+
         // Поиск по OEM (столбец N)
         function searchByOEM(query) {
             if (!query.trim()) return [];
@@ -952,6 +960,7 @@
             }
 
             const initialItems = shuffle(popularSourceItems).slice(0, POPULAR_COUNT);
+            renderCategories(popularSourceItems);
             renderPopular(initialItems);
         }
 

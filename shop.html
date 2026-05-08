@@ -429,7 +429,9 @@
     let allItems = [];
     let filteredItems = [];
     let shown = 0;
-    const initialSearchQuery = new URLSearchParams(window.location.search).get('q') || '';
+    const initialParams = new URLSearchParams(window.location.search);
+    const initialSearchQuery = initialParams.get('q') || '';
+    const initialCategory = initialParams.get('category') || '';
 
     function formatRub(value) {
       return `${Math.round(Number(value) || 0).toLocaleString('ru-RU')} ₽`;
@@ -668,8 +670,14 @@
         fillSelect(conditionSelect, conditions);
 
         // Стартовый вывод: первые 200 (без фильтров)
-        if (initialSearchQuery && searchInput) {
-          searchInput.value = initialSearchQuery;
+        if (initialCategory && categorySelect) {
+          categorySelect.value = initialCategory;
+        }
+
+        if ((initialSearchQuery && searchInput) || (initialCategory && categorySelect && categorySelect.value === initialCategory)) {
+          if (initialSearchQuery && searchInput) {
+            searchInput.value = initialSearchQuery;
+          }
           applyFilters();
         } else {
           filteredItems = allItems.slice();
