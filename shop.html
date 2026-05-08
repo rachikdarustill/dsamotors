@@ -362,28 +362,58 @@
       .footer-inner { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 640px) {
+      .container {
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+      }
+      .topbar-inner {
+        gap: 14px;
+        padding-bottom: 14px;
+      }
+      .page { padding-top: 22px; }
       .section-header {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: 12px;
+        margin: 8px 0 18px;
       }
       .section-header .btn { width: 100%; }
+      .toolbar {
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+      .search,
+      .filter-panel {
+        padding: 14px;
+      }
+      .grid {
+        gap: 16px;
+      }
+      .footer-inner {
+        gap: 22px;
+        padding: 28px 0;
+      }
     }
     @media (max-width: 560px) {
       .grid { grid-template-columns: 1fr; }
       .header-logo { width: 44px; height: 44px; }
       .header-phone { padding: 8px 12px; font-size: 14px; flex: 1; justify-content: center; }
-      .search { flex-direction: column; align-items: stretch; }
+      .search { flex-direction: column; align-items: stretch; gap: 12px; }
       .search input { min-height: 48px; font-size: 16px; }
       .search button { width: 100%; }
-      .filters { grid-template-columns: 1fr; }
-      .filters-actions { flex-direction: column; }
+      .filters { grid-template-columns: 1fr; gap: 12px; }
+      .filters-actions { flex-direction: column; gap: 12px; margin-top: 14px; }
       .filters-actions .btn { width: 100%; }
       .card { padding: 16px; }
       .product-title { font-size: 15px; line-height: 1.35; }
       .controls .btn { width: 100%; min-height: 48px; font-size: 15px; }
       .footer-inner { grid-template-columns: 1fr; }
       .brand-name { font-size: 20px; }
+      .summary { margin: 14px 0; line-height: 1.45; }
+      .footer-col a,
+      .footer-col .non-clickable {
+        padding: 7px 0;
+      }
     }
 
     /* Reinforce pointer after component rules (e.g. .card) */

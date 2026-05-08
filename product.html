@@ -371,29 +371,54 @@
     }
 
     @media (max-width: 960px) {
-      .product { grid-template-columns: 1fr; }
+      .product { grid-template-columns: 1fr; gap: 16px; }
       .thumbs { grid-template-columns: repeat(5, 1fr); }
       .footer-inner { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 640px) {
-      .breadcrumbs { font-size: 13px; margin: 10px 0 12px; gap: 8px; }
+      .container {
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+      }
+      .topbar-inner {
+        gap: 14px;
+        padding-bottom: 14px;
+      }
+      .page { padding-top: 22px; }
+      .breadcrumbs { font-size: 13px; margin: 8px 0 16px; gap: 8px; }
       .title { font-size: clamp(17px, 5vw, 24px); }
       .price { font-size: 22px; }
+      .product-side { gap: 16px; }
+      .panel-inner { padding: 16px; }
+      .meta { gap: 12px; }
+      .actions { gap: 12px; }
+      .footer-inner {
+        gap: 22px;
+        padding: 28px 0;
+      }
     }
     @media (max-width: 560px) {
       .thumbs {
         grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        padding: 10px;
+        gap: 10px;
+        padding: 12px;
       }
       .meta { grid-template-columns: 1fr; }
       .header-logo { width: 44px; height: 44px; }
       .header-phone { padding: 8px 12px; font-size: 14px; flex: 1; justify-content: center; }
-      .panel-inner { padding: 14px; }
+      .panel-inner { padding: 16px; }
+      .desc {
+        margin-top: 18px;
+        padding-top: 16px;
+      }
       .similar-card { grid-template-columns: 72px 1fr; }
       .similar-card img { width: 72px; }
       .footer-inner { grid-template-columns: 1fr; }
       .brand-name { font-size: 20px; }
+      .footer-col a,
+      .footer-col .non-clickable {
+        padding: 7px 0;
+      }
     }
   </style>
 </head>
