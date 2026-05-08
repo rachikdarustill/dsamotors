@@ -262,6 +262,53 @@
     }
     .empty strong { color: var(--text); }
 
+    .product-side {
+      display: grid;
+      gap: 14px;
+    }
+    .similar-list {
+      display: grid;
+      gap: 10px;
+    }
+    .similar-heading {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+    }
+    .similar-card {
+      display: grid;
+      grid-template-columns: 82px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--muted);
+      border-radius: 12px;
+      background: #FBFCFD;
+      color: inherit;
+      text-decoration: none;
+    }
+    .similar-card:hover {
+      border-color: rgba(8,170,243,0.45);
+      box-shadow: var(--shadow);
+    }
+    .similar-card img {
+      width: 82px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--muted);
+      background: #f1f4f6;
+    }
+    .similar-title {
+      font-weight: 750;
+      line-height: 1.25;
+      font-size: 14px;
+    }
+    .similar-meta {
+      margin-top: 6px;
+      color: #6a6c6d;
+      font-size: 12px;
+    }
+
     footer {
       margin-top: 28px;
       background: var(--white);
@@ -343,6 +390,8 @@
       .header-logo { width: 44px; height: 44px; }
       .header-phone { padding: 8px 12px; font-size: 14px; flex: 1; justify-content: center; }
       .panel-inner { padding: 14px; }
+      .similar-card { grid-template-columns: 72px 1fr; }
+      .similar-card img { width: 72px; }
       .footer-inner { grid-template-columns: 1fr; }
       .brand-name { font-size: 20px; }
     }
@@ -518,7 +567,32 @@
       `;
     }
 
-    function renderProduct(item) {
+    function renderSimilarProducts(items) {
+      if (!items.length) return '';
+      return `
+        <div class="panel">
+          <div class="panel-inner">
+            <h2 class="similar-heading">Похожие</h2>
+            <div class="similar-list">
+              ${items.map((item) => {
+                const image = (item.images && item.images[0]) ? item.images[0] : './no-image.svg';
+                return `
+                  <a class="similar-card" href="./product.html?i=${encodeURIComponent(item.id)}">
+                    <img src="${escapeHtml(image)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.onerror=null;this.src='./no-image.svg'">
+                    <div>
+                      <div class="similar-title">${escapeHtml(item.title)}</div>
+                      <div class="similar-meta">${formatRub(item.price)}${item.oem ? ` · OEM: ${escapeHtml(item.oem)}` : ''}</div>
+                    </div>
+                  </a>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderProduct(item, similarItems) {
       const images = (item.images && item.images.length) ? item.images : ['./no-image.svg'];
       const main = images[0] || './no-image.svg';
 
@@ -534,11 +608,14 @@
 
       return `
         <section class="product">
-          <div class="panel">
-            <div class="gallery">
-              <img id="mainImage" class="main-image" src="${escapeHtml(main)}" alt="${escapeHtml(item.title)}" onerror="this.onerror=null;this.src='./no-image.svg'">
-              ${images.length > 1 ? `<div class="thumbs" role="list">${thumbsHtml}</div>` : ''}
+          <div class="product-side">
+            <div class="panel">
+              <div class="gallery">
+                <img id="mainImage" class="main-image" src="${escapeHtml(main)}" alt="${escapeHtml(item.title)}" onerror="this.onerror=null;this.src='./no-image.svg'">
+                ${images.length > 1 ? `<div class="thumbs" role="list">${thumbsHtml}</div>` : ''}
+              </div>
             </div>
+            ${renderSimilarProducts(similarItems || [])}
           </div>
 
           <div class="panel">
@@ -563,6 +640,10 @@
                 <div class="meta-item">
                   <div class="k">Бренд</div>
                   <div class="v">${item.brand ? escapeHtml(item.brand) : '—'}</div>
+                </div>
+                <div class="meta-item">
+                  <div class="k">Бренд авто</div>
+                  <div class="v">${item.make ? escapeHtml(item.make) : '—'}</div>
                 </div>
               </div>
 
@@ -608,6 +689,7 @@
         const titleIndex = idx(/title|наименование|name/, 3);
         const descriptionIndex = idx(/description|описан/, 4);
         const brandIndex = idx(/brand|бренд/, 6);
+        const makeIndex = idx(/^make$|марка авто|марка автомобиля/, 7);
         const priceIndex = idx(/price|цена/, 10);
         const oemIndex = idx(/^oem$|oem|артикул|partnumber/, 13);
 
@@ -629,6 +711,7 @@
           title: titleIndex >= 0 ? String(cols[titleIndex] || '').trim() : '',
           description: descriptionIndex >= 0 ? String(cols[descriptionIndex] || '').trim() : '',
           brand: brandIndex >= 0 ? String(cols[brandIndex] || '').trim() : '',
+          make: makeIndex >= 0 ? String(cols[makeIndex] || '').trim() : '',
           price: priceIndex >= 0 ? toNumberPrice(cols[priceIndex]) : 0,
           oem: oemIndex >= 0 ? String(cols[oemIndex] || '').trim() : '',
           images: extractImages(cols, imageIndexes),
@@ -656,7 +739,16 @@
         }
 
         document.title = `DSA | ${item.title}`;
-        content.innerHTML = renderProduct(item);
+        const sameCategory = String(item.category || '').trim().toLowerCase();
+        const sameMake = String(item.make || '').trim().toLowerCase();
+        const similarItems = sameCategory && sameMake
+          ? items.filter((candidate) => (
+              candidate.id !== item.id
+              && String(candidate.category || '').trim().toLowerCase() === sameCategory
+              && String(candidate.make || '').trim().toLowerCase() === sameMake
+            )).slice(0, 4)
+          : [];
+        content.innerHTML = renderProduct(item, similarItems);
 
         const mainImage = document.getElementById('mainImage');
         const thumbs = Array.from(document.querySelectorAll('.thumb'));
