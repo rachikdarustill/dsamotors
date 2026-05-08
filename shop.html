@@ -429,6 +429,7 @@
     let allItems = [];
     let filteredItems = [];
     let shown = 0;
+    const initialSearchQuery = new URLSearchParams(window.location.search).get('q') || '';
 
     function formatRub(value) {
       return `${Math.round(Number(value) || 0).toLocaleString('ru-RU')} ₽`;
@@ -667,10 +668,15 @@
         fillSelect(conditionSelect, conditions);
 
         // Стартовый вывод: первые 200 (без фильтров)
-        filteredItems = allItems.slice();
-        shown = 0;
-        gridEl.innerHTML = '';
-        appendNextBatch();
+        if (initialSearchQuery && searchInput) {
+          searchInput.value = initialSearchQuery;
+          applyFilters();
+        } else {
+          filteredItems = allItems.slice();
+          shown = 0;
+          gridEl.innerHTML = '';
+          appendNextBatch();
+        }
 
         if (showMoreBtn) {
           showMoreBtn.addEventListener('click', appendNextBatch);

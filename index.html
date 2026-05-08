@@ -574,9 +574,9 @@
         <div class="container hero-inner">
             <div>
                 <h1>Оригинальные запчасти</h1>
-                <p>Поиск по VIN или номеру детали. Подбор для популярных серий — от C‑Class и E‑Class до GLE и Sprinter. Быстрая доставка по всей России.</p>
-                <form id="search" class="search" action="#" role="search" aria-label="Поиск запчастей">
-                    <input type="text" name="q" id="searchInput" placeholder="VIN Mercedes / номер детали" aria-label="VIN Mercedes или номер детали">
+                <p>Поиск по VIN или номеру детали</p>
+                <form id="search" class="search" action="./shop.html" method="get" role="search" aria-label="Поиск запчастей">
+                    <input type="text" name="q" id="searchInput" placeholder="VIN / номер детали" aria-label="VIN или номер детали">
                     <button type="submit">Найти запчасти</button>
                 </form>
             </div>
@@ -631,7 +631,7 @@
 
         <section id="popular" class="section container">
             <div class="section-header" id="popularHeader">
-                <h2 class="section-title" id="popularTitle">Популярные товары для Mercedes‑Benz</h2>
+                <h2 class="section-title" id="popularTitle">Популярные товары</h2>
                 <a id="catalogLink" class="link" href="./shop.html">Каталог</a>
             </div>
             <div class="grid" id="popular-grid" aria-live="polite"></div>
@@ -724,8 +724,8 @@
         </div>
     </footer>
 
-    <a href="#" class="corner-logo" aria-label="DSA логотип Mercedes">
-        <img src="./logo.png" alt="DSA логотип Mercedes">
+    <a href="#" class="corner-logo" aria-label="DSA">
+        <img src="./logo.png" alt="DSA">
     </a>
 
     <script>
@@ -964,7 +964,7 @@
                     alert('Введите VIN или номер детали для поиска');
                     return;
                 }
-                showSearchResults(query);
+                window.location.href = `./shop.html?q=${encodeURIComponent(query)}`;
             });
         }
 
