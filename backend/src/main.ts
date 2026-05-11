@@ -1,6 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import express from 'express';
+import { text } from 'express';
 import { AppModule } from './modules/app.module';
 import { PrismaService } from './modules/prisma/prisma.service';
 
@@ -10,7 +10,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.enableCors();
-  app.use('/api/tochka/webhook', express.text({ type: '*/*' }));
+  app.use('/api/tochka/webhook', text({ type: '*/*' }));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
