@@ -128,6 +128,7 @@ export class TochkaService {
       'id',
     ]) || input.paymentLinkId;
     const paymentUrl = extractStringByKeys(responseData, [
+      'paymentLink',
       'paymentLinkUrl',
       'paymentUrl',
       'link',
