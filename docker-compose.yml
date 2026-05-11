@@ -34,6 +34,8 @@ services:
       context: ./frontend
     env_file:
       - .env
+    environment:
+      PORT: 3000
     expose:
       - "3000"
     restart: unless-stopped
@@ -43,7 +45,9 @@ services:
       context: ./backend
     env_file:
       - .env
-    command: /bin/sh -c "npx prisma db push && node dist/main.js"
+    command: /bin/sh -c "until nc -z postgres 5432; do echo 'waiting for postgres'; sleep 2; done; npx prisma db push && node dist/main.js"
+    depends_on:
+      - postgres
     volumes:
       - ./feed.csv:/app/data/feed.csv:ro
     expose:
