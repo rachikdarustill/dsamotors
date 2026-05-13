@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#08AAF3" />
+  <title>DSA | Карточка товара</title>
+  <meta name="description" content="Карточка товара DSA Motors — фото, описание, OEM и цена." />
+  <link rel="icon" href="./logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="./logo.png">
+  <style>
+    :root {
+      --primary: #08AAF3;
+      --text: #4B4C4D;
+      --white: #FEFEFE;
+      --bg: #F6F8FA;
+      --muted: #E6E8EA;
+      --shadow: 0 10px 22px rgba(8,170,243,0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    /* Clickable elements should show pointer cursor */
+    a[href],
+    button:not(:disabled),
+    input[type="button"]:not(:disabled),
+    input[type="submit"]:not(:disabled),
+    input[type="reset"]:not(:disabled),
+    label[for],
+    summary,
+    [role="button"]:not([aria-disabled="true"]),
+    [onclick] {
+      cursor: pointer;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right));
+    }
+
+    /* Header */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--muted);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: max(10px, env(safe-area-inset-top)) 0 12px;
+      min-height: calc(52px + env(safe-area-inset-top));
+    }
+    .header-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      background: var(--white);
+      border: 1px solid var(--muted);
+    }
+    .header-logo img {
+      width: 80%;
+      height: 80%;
+      object-fit: contain;
+    }
+    .header-phone {
+      font-weight: 600;
+      background: var(--bg);
+      padding: 8px 14px;
+      border-radius: 30px;
+      border: 1px solid var(--muted);
+      transition: all 0.2s;
+      color: var(--primary);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .header-phone:hover {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+    }
+
+    /* Layout */
+    .page {
+      padding: 18px 0 max(28px, env(safe-area-inset-bottom));
+    }
+    .breadcrumbs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      color: #6a6c6d;
+      font-size: 14px;
+      margin: 14px 0;
+    }
+    .crumb {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .crumb a {
+      color: var(--primary);
+      font-weight: 650;
+    }
+    .crumb-sep { opacity: 0.7; }
+
+    .product {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--white);
+      border: 1px solid var(--muted);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .panel-inner { padding: 16px; }
+
+    /* Gallery */
+    .gallery {
+      display: grid;
+      grid-template-rows: auto auto;
+      gap: 12px;
+    }
+    .main-image {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-bottom: 1px solid var(--muted);
+      background: #f1f4f6;
+      object-fit: contain;
+    }
+    .thumbs {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      padding: 12px;
+    }
+    .thumb {
+      border: 1px solid var(--muted);
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .thumb:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+    .thumb[aria-current="true"] { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(8,170,243,0.18); }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Info */
+    .pill {
+      display: inline-block;
+      background: #E9F8FF;
+      color: var(--primary);
+      border: 1px solid #CDEFFF;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .title {
+      margin: 10px 0 10px;
+      font-weight: 850;
+      font-size: clamp(18px, 2.6vw, 28px);
+      line-height: 1.15;
+    }
+    .price {
+      color: var(--primary);
+      font-weight: 900;
+      font-size: 24px;
+      letter-spacing: 0.2px;
+      margin: 4px 0 10px;
+    }
+    .meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .meta-item {
+      border: 1px solid var(--muted);
+      background: #FBFCFD;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .meta-item .k { font-size: 12px; color: #6a6c6d; }
+    .meta-item .v { margin-top: 6px; font-weight: 750; word-break: break-word; }
+
+    .actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .btn {
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--muted);
+      background: var(--white);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 750;
+      text-align: center;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: var(--white);
+    }
+    .btn:hover { filter: brightness(0.98); }
+
+    .desc {
+      margin-top: 16px;
+      border-top: 1px solid var(--muted);
+      padding-top: 14px;
+    }
+    .desc h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+    }
+    .desc .text {
+      color: #5b5d5e;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .empty {
+      padding: 28px 16px;
+      text-align: center;
+      color: #6a6c6d;
+    }
+    .empty strong { color: var(--text); }
+
+    .product-side {
+      display: grid;
+      gap: 14px;
+    }
+    .similar-list {
+      display: grid;
+      gap: 10px;
+    }
+    .similar-heading {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+    }
+    .similar-card {
+      display: grid;
+      grid-template-columns: 82px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--muted);
+      border-radius: 12px;
+      background: #FBFCFD;
+      color: inherit;
+      text-decoration: none;
+    }
+    .similar-card:hover {
+      border-color: rgba(8,170,243,0.45);
+      box-shadow: var(--shadow);
+    }
+    .similar-card img {
+      width: 82px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--muted);
+      background: #f1f4f6;
+    }
+    .similar-title {
+      font-weight: 750;
+      line-height: 1.25;
+      font-size: 14px;
+    }
+    .similar-meta {
+      margin-top: 6px;
+      color: #6a6c6d;
+      font-size: 12px;
+    }
+
+    footer {
+      margin-top: 44px;
+      background: var(--white);
+      border-top: 1px solid var(--muted);
+    }
+    .footer-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 16px;
+      padding: 24px 0;
+    }
+    .footer-col h5 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #6a6c6d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .footer-col .non-clickable {
+      display: block;
+      padding: 6px 0;
+      color: var(--text);
+      cursor: default;
+      text-decoration: none;
+      pointer-events: none;
+    }
+    .footer-col a {
+      display: block;
+      padding: 6px 0;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .footer-col a:hover { color: var(--primary); }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .footer-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      border: 1px solid var(--muted);
+      background: var(--white);
+      object-fit: contain;
+      padding: 6px;
+    }
+    .brand-name {
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--text);
+    }
+    .copyright {
+      border-top: 1px solid var(--muted);
+      padding: 14px 0 max(14px, env(safe-area-inset-bottom));
+      font-size: 13px;
+      color: #6a6c6d;
+      text-align: center;
+    }
+
+    @media (max-width: 960px) {
+      .product { grid-template-columns: 1fr; gap: 16px; }
+      .thumbs { grid-template-columns: repeat(5, 1fr); }
+      .footer-inner { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .container {
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+      }
+      .topbar-inner {
+        gap: 14px;
+        padding-bottom: 14px;
+      }
+      .page { padding-top: 22px; }
+      .breadcrumbs { font-size: 13px; margin: 8px 0 16px; gap: 8px; }
+      .title { font-size: clamp(17px, 5vw, 24px); }
+      .price { font-size: 22px; }
+      .product-side { gap: 16px; }
+      .panel-inner { padding: 16px; }
+      .meta { gap: 12px; }
+      .actions { gap: 12px; }
+      .footer-inner {
+        gap: 22px;
+        padding: 28px 0;
+      }
+      footer {
+        margin-top: 44px;
+      }
+    }
+    @media (max-width: 560px) {
+      .thumbs {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        padding: 12px;
+      }
+      .meta { grid-template-columns: 1fr; }
+      .header-logo { width: 44px; height: 44px; }
+      .header-phone { padding: 8px 12px; font-size: 14px; flex: 1; justify-content: center; }
+      .panel-inner { padding: 16px; }
+      .desc {
+        margin-top: 18px;
+        padding-top: 16px;
+      }
+      .similar-card { grid-template-columns: 72px 1fr; }
+      .similar-card img { width: 72px; }
+      .footer-inner { grid-template-columns: 1fr; }
+      .brand-name { font-size: 20px; }
+      .footer-col a,
+      .footer-col .non-clickable {
+        padding: 7px 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding-left: max(24px, env(safe-area-inset-left)) !important;
+        padding-right: max(24px, env(safe-area-inset-right)) !important;
+      }
+      .breadcrumbs,
+      .product,
+      .footer-inner {
+        padding-left: 2px;
+        padding-right: 2px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="header-logo" href="./index.html" aria-label="На главную">
+        <img src="./logo.png" alt="DSA логотип" />
+      </a>
+      <a href="tel:89000013023" class="header-phone">8 (900) 001-30-23</a>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Хлебные крошки">
+        <span class="crumb"><a href="./index.html">Главная</a></span>
+        <span class="crumb-sep">/</span>
+        <span class="crumb">Карточка товара</span>
+      </nav>
+
+      <div id="content"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-col">
+        <div class="footer-brand">
+          <img class="footer-logo" src="./logo.png" alt="DSA Motors">
+          <div class="brand-name">DSA Motors</div>
+        </div>
+        <p style="margin:0;color:#6a6c6d;">Интернет-магазин запчастей</p>
+      </div>
+      <div class="footer-col">
+        <h5>Категории</h5>
+        <div id="footer-categories"></div>
+      </div>
+      <div class="footer-col">
+        <h5>Покупателям</h5>
+        <span class="non-clickable">Доставка и оплата</span>
+        <span class="non-clickable">Гарантия и возврат</span>
+      </div>
+      <div class="footer-col">
+        <h5>Контакты</h5>
+        <a href="mailto:support@dsamotors.com">support@dsamotors.com</a>
+        <a href="tel:89000013023">+7 (900) 001-30-23</a>
+      </div>
+    </div>
+    <div class="copyright">
+      © <span id="year"></span> DSA. Все права защищены.
+    </div>
+  </footer>
+
+  <script>
+    const yearEl = document.getElementById('year');
+    const footerCategories = document.getElementById('footer-categories');
+
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatRub(value) {
+      return `${Math.round(Number(value) || 0).toLocaleString('ru-RU')} ₽`;
+    }
+
+    function toNumberPrice(raw) {
+      const n = Number(String(raw || '').replace(/[^\d.,]/g, '').replace(',', '.'));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function extractImages(cols, imageIndexes) {
+      const urls = [];
+      for (const idx of imageIndexes) {
+        const v = (idx >= 0 && cols[idx]) ? String(cols[idx]).trim() : '';
+        if (v) urls.push(v);
+      }
+      const seen = new Set();
+      return urls.filter((u) => {
+        const key = u.trim();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function renderFooterCategories(items) {
+      if (!footerCategories) return;
+      const counts = new Map();
+      items.forEach((item) => {
+        const category = String(item.category || '').trim();
+        if (!category) return;
+        counts.set(category, (counts.get(category) || 0) + 1);
+      });
+      const categories = Array.from(counts.entries())
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'))
+        .slice(0, 4);
+      footerCategories.innerHTML = categories.map(([category]) => {
+        const href = `./shop.html?category=${encodeURIComponent(category)}`;
+        return `<a href="${href}">${escapeHtml(category)}</a>`;
+      }).join('');
+    }
+
+    function parseCsv(csvText) {
+      const rows = [];
+      const text = csvText.replace(/^\uFEFF/, '');
+      let current = '';
+      let row = [];
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i += 1) {
+        const ch = text[i];
+        const next = text[i + 1];
+        if (ch === '"') {
+          if (inQuotes && next === '"') {
+            current += '"';
+            i += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (ch === ',' && !inQuotes) {
+          row.push(current);
+          current = '';
+        } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+          if (ch === '\r' && next === '\n') i += 1;
+          row.push(current);
+          if (row.some((cell) => String(cell || '').trim().length > 0)) rows.push(row);
+          row = [];
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+      if (current.length > 0 || row.length > 0) {
+        row.push(current);
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function normalizeHeader(h) {
+      return String(h || '').trim().toLowerCase().replace(/^["']|["']$/g, '');
+    }
+
+    function getQuery() {
+      const p = new URLSearchParams(location.search);
+      return {
+        i: p.get('i'),
+        oem: p.get('oem'),
+      };
+    }
+
+    function renderEmpty(message, detail) {
+      return `
+        <section class="panel">
+          <div class="empty">
+            <strong>${escapeHtml(message)}</strong>
+            ${detail ? `<div style="margin-top:10px;">${escapeHtml(detail)}</div>` : ''}
+            <div style="margin-top:14px;">
+              <a class="btn primary" href="./index.html">Вернуться на главную</a>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderSimilarProducts(items) {
+      if (!items.length) return '';
+      return `
+        <div class="panel">
+          <div class="panel-inner">
+            <h2 class="similar-heading">Похожие</h2>
+            <div class="similar-list">
+              ${items.map((item) => {
+                const image = (item.images && item.images[0]) ? item.images[0] : './no-image.svg';
+                return `
+                  <a class="similar-card" href="./product.html?i=${encodeURIComponent(item.id)}">
+                    <img src="${escapeHtml(image)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="this.onerror=null;this.src='./no-image.svg'">
+                    <div>
+                      <div class="similar-title">${escapeHtml(item.title)}</div>
+                      <div class="similar-meta">${formatRub(item.price)}${item.oem ? ` · OEM: ${escapeHtml(item.oem)}` : ''}</div>
+                    </div>
+                  </a>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderProduct(item, similarItems) {
+      const images = (item.images && item.images.length) ? item.images : ['./no-image.svg'];
+      const main = images[0] || './no-image.svg';
+
+      const thumbsHtml = images.slice(0, 12).map((src, idx) => {
+        const safe = escapeHtml(src);
+        const current = idx === 0 ? 'true' : 'false';
+        return `
+          <button class="thumb" type="button" aria-current="${current}" data-src="${safe}" aria-label="Открыть фото ${idx + 1}">
+            <img src="${safe}" alt="" loading="lazy" onerror="this.onerror=null;this.src='./no-image.svg'">
+          </button>
+        `;
+      }).join('');
+
+      return `
+        <section class="product">
+          <div class="product-side">
+            <div class="panel">
+              <div class="gallery">
+                <img id="mainImage" class="main-image" src="${escapeHtml(main)}" alt="${escapeHtml(item.title)}" onerror="this.onerror=null;this.src='./no-image.svg'">
+                ${images.length > 1 ? `<div class="thumbs" role="list">${thumbsHtml}</div>` : ''}
+              </div>
+            </div>
+            ${renderSimilarProducts(similarItems || [])}
+          </div>
+
+          <div class="panel">
+            <div class="panel-inner">
+              <div class="pill">${escapeHtml(item.category || 'Запчасть')}</div>
+              <h1 class="title">${escapeHtml(item.title || 'Товар')}</h1>
+              <div class="price">${formatRub(item.price)}</div>
+
+              <div class="meta">
+                <div class="meta-item">
+                  <div class="k">OEM</div>
+                  <div class="v">${item.oem ? escapeHtml(item.oem) : '—'}</div>
+                </div>
+                <div class="meta-item">
+                  <div class="k">Состояние</div>
+                  <div class="v">${item.condition ? escapeHtml(item.condition) : '—'}</div>
+                </div>
+                <div class="meta-item">
+                  <div class="k">Адрес</div>
+                  <div class="v">${item.address ? escapeHtml(item.address) : '—'}</div>
+                </div>
+                <div class="meta-item">
+                  <div class="k">Бренд</div>
+                  <div class="v">${item.brand ? escapeHtml(item.brand) : '—'}</div>
+                </div>
+                <div class="meta-item">
+                  <div class="k">Бренд авто</div>
+                  <div class="v">${item.make ? escapeHtml(item.make) : '—'}</div>
+                </div>
+              </div>
+
+              <div class="actions">
+                <a class="btn primary" href="tel:89000013023">Позвонить и заказать</a>
+                <a class="btn" href="./index.html#popular">Вернуться в каталог</a>
+              </div>
+
+              <div class="desc">
+                <h3>Описание</h3>
+                <div class="text">${escapeHtml(item.description || 'Описание не указано.')}</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    async function init() {
+      const content = document.getElementById('content');
+      const q = getQuery();
+
+      try {
+        const res = await fetch('./feed.csv', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const csvText = await res.text();
+        const rows = parseCsv(csvText);
+        if (!rows.length) {
+          content.innerHTML = renderEmpty('Фид пустой.', 'В файле feed.csv нет данных.');
+          return;
+        }
+
+        const headers = rows[0].map(normalizeHeader);
+        const idx = (nameRe, fallbackIndex) => {
+          const found = headers.findIndex((h) => nameRe.test(h));
+          if (found !== -1) return found;
+          return (rows[0].length > fallbackIndex) ? fallbackIndex : -1;
+        };
+
+        const categoryIndex = idx(/category|категор/, 0);
+        const conditionIndex = idx(/condition|состояни/, 1);
+        const addressIndex = idx(/address|адрес/, 2);
+        const titleIndex = idx(/title|наименование|name/, 3);
+        const descriptionIndex = idx(/description|описан/, 4);
+        const brandIndex = idx(/brand|бренд/, 6);
+        const makeIndex = idx(/^make$|марка авто|марка автомобиля/, 7);
+        const priceIndex = idx(/price|цена/, 10);
+        const oemIndex = idx(/^oem$|oem|артикул|partnumber/, 13);
+
+        const imageIndexes = [];
+        for (let i = 0; i < headers.length; i += 1) {
+          if (/^images\d+$/.test(headers[i]) || /^images1$/.test(headers[i])) imageIndexes.push(i);
+        }
+        if (!imageIndexes.length) {
+          for (let i = 15; i < 25; i += 1) {
+            if (rows[0].length > i) imageIndexes.push(i);
+          }
+        }
+
+        const items = rows.slice(1).map((cols, rowIdx) => ({
+          id: rowIdx,
+          category: categoryIndex >= 0 ? String(cols[categoryIndex] || '').trim() : '',
+          condition: conditionIndex >= 0 ? String(cols[conditionIndex] || '').trim() : '',
+          address: addressIndex >= 0 ? String(cols[addressIndex] || '').trim() : '',
+          title: titleIndex >= 0 ? String(cols[titleIndex] || '').trim() : '',
+          description: descriptionIndex >= 0 ? String(cols[descriptionIndex] || '').trim() : '',
+          brand: brandIndex >= 0 ? String(cols[brandIndex] || '').trim() : '',
+          make: makeIndex >= 0 ? String(cols[makeIndex] || '').trim() : '',
+          price: priceIndex >= 0 ? toNumberPrice(cols[priceIndex]) : 0,
+          oem: oemIndex >= 0 ? String(cols[oemIndex] || '').trim() : '',
+          images: extractImages(cols, imageIndexes),
+        })).filter((x) => x.title);
+        renderFooterCategories(items);
+
+        if (!q.i && !q.oem) {
+          content.innerHTML = renderEmpty('Не указан товар.', 'Откройте карточку из списка товаров на главной странице.');
+          return;
+        }
+
+        let item = null;
+        if (q.i !== null && q.i !== undefined && q.i !== '') {
+          const iNum = Number(q.i);
+          if (Number.isFinite(iNum)) item = items.find((x) => x.id === iNum) || null;
+        }
+        if (!item && q.oem) {
+          const needle = String(q.oem).trim().toLowerCase();
+          item = items.find((x) => (x.oem || '').toLowerCase() === needle) || null;
+        }
+
+        if (!item) {
+          content.innerHTML = renderEmpty('Товар не найден.', 'Возможно, ссылка устарела. Попробуйте открыть товар с главной.');
+          return;
+        }
+
+        document.title = `DSA | ${item.title}`;
+        const sameCategory = String(item.category || '').trim().toLowerCase();
+        const sameMake = String(item.make || '').trim().toLowerCase();
+        const similarItems = sameCategory && sameMake
+          ? items.filter((candidate) => (
+              candidate.id !== item.id
+              && String(candidate.category || '').trim().toLowerCase() === sameCategory
+              && String(candidate.make || '').trim().toLowerCase() === sameMake
+            )).slice(0, 4)
+          : [];
+        content.innerHTML = renderProduct(item, similarItems);
+
+        const mainImage = document.getElementById('mainImage');
+        const thumbs = Array.from(document.querySelectorAll('.thumb'));
+        thumbs.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const src = btn.getAttribute('data-src') || './no-image.svg';
+            if (mainImage) mainImage.src = src;
+            thumbs.forEach((b) => b.setAttribute('aria-current', 'false'));
+            btn.setAttribute('aria-current', 'true');
+          });
+        });
+      } catch (e) {
+        content.innerHTML = renderEmpty('Не удалось загрузить товар.', 'Проверьте, что файл feed.csv доступен рядом с сайтом.');
+        console.warn(e);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
+
