@@ -295,31 +295,128 @@
     .panel + .panel { margin-top: 14px; }
     .error { color: #6a6c6d; line-height: 1.6; }
 
+    footer {
+      margin-top: 44px;
+      background: var(--white);
+      border-top: 1px solid var(--muted);
+    }
+    .footer-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 16px;
+      padding: 24px 0;
+    }
+    .footer-col h5 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #6a6c6d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .footer-col .non-clickable {
+      display: block;
+      padding: 6px 0;
+      color: var(--text);
+      cursor: default;
+      text-decoration: none;
+      pointer-events: none;
+    }
+    .footer-col a {
+      display: block;
+      padding: 6px 0;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .footer-col a:hover { color: var(--primary); }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .footer-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      border: 1px solid var(--muted);
+      background: var(--white);
+      object-fit: contain;
+      padding: 6px;
+    }
+    .brand-name {
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--text);
+    }
+    .copyright {
+      border-top: 1px solid var(--muted);
+      padding: 14px 0 max(14px, env(safe-area-inset-bottom));
+      font-size: 13px;
+      color: #6a6c6d;
+      text-align: center;
+    }
+
     @media (max-width: 960px) {
       .grid { grid-template-columns: repeat(2, 1fr); }
       .toolbar { grid-template-columns: 1fr; }
+      .footer-inner { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 640px) {
+      .container {
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+      }
+      .topbar-inner {
+        gap: 14px;
+        padding-bottom: 14px;
+      }
+      .page { padding-top: 22px; }
       .section-header {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: 12px;
+        margin: 8px 0 18px;
       }
       .section-header .btn { width: 100%; }
+      .toolbar {
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+      .search,
+      .filter-panel {
+        padding: 14px;
+      }
+      .grid {
+        gap: 16px;
+      }
+      .footer-inner {
+        gap: 22px;
+        padding: 28px 0;
+      }
+      footer {
+        margin-top: 44px;
+      }
     }
     @media (max-width: 560px) {
       .grid { grid-template-columns: 1fr; }
       .header-logo { width: 44px; height: 44px; }
       .header-phone { padding: 8px 12px; font-size: 14px; flex: 1; justify-content: center; }
-      .search { flex-direction: column; align-items: stretch; }
+      .search { flex-direction: column; align-items: stretch; gap: 12px; }
       .search input { min-height: 48px; font-size: 16px; }
       .search button { width: 100%; }
-      .filters { grid-template-columns: 1fr; }
-      .filters-actions { flex-direction: column; }
+      .filters { grid-template-columns: 1fr; gap: 12px; }
+      .filters-actions { flex-direction: column; gap: 12px; margin-top: 14px; }
       .filters-actions .btn { width: 100%; }
       .card { padding: 16px; }
       .product-title { font-size: 15px; line-height: 1.35; }
       .controls .btn { width: 100%; min-height: 48px; font-size: 15px; }
+      .footer-inner { grid-template-columns: 1fr; }
+      .brand-name { font-size: 20px; }
+      .summary { margin: 14px 0; line-height: 1.45; }
+      .footer-col a,
+      .footer-col .non-clickable {
+        padding: 7px 0;
+      }
     }
 
     /* Reinforce pointer after component rules (e.g. .card) */
@@ -328,6 +425,22 @@
     select,
     a.card {
       cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding-left: max(24px, env(safe-area-inset-left)) !important;
+        padding-right: max(24px, env(safe-area-inset-right)) !important;
+      }
+      .section-header,
+      .toolbar,
+      .summary,
+      .grid,
+      .controls,
+      .footer-inner {
+        padding-left: 2px;
+        padding-right: 2px;
+      }
     }
   </style>
 </head>
@@ -371,6 +484,12 @@
               </select>
             </div>
             <div class="field">
+              <label for="brandSelect">Бренд автомобиля</label>
+              <select id="brandSelect">
+                <option value="">Все</option>
+              </select>
+            </div>
+            <div class="field">
               <label for="minPrice">Цена от, ₽</label>
               <input id="minPrice" type="number" min="0" step="1" placeholder="0">
             </div>
@@ -407,9 +526,39 @@
     </div>
   </main>
 
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-col">
+        <div class="footer-brand">
+          <img class="footer-logo" src="./logo.png" alt="DSA Motors">
+          <div class="brand-name">DSA Motors</div>
+        </div>
+        <p style="margin:0;color:#6a6c6d;">Интернет-магазин запчастей</p>
+      </div>
+      <div class="footer-col">
+        <h5>Категории</h5>
+        <div id="footer-categories"></div>
+      </div>
+      <div class="footer-col">
+        <h5>Покупателям</h5>
+        <span class="non-clickable">Доставка и оплата</span>
+        <span class="non-clickable">Гарантия и возврат</span>
+      </div>
+      <div class="footer-col">
+        <h5>Контакты</h5>
+        <a href="mailto:support@dsamotors.com">support@dsamotors.com</a>
+        <a href="tel:89000013023">+7 (900) 001-30-23</a>
+      </div>
+    </div>
+    <div class="copyright">
+      © <span id="year"></span> DSA. Все права защищены.
+    </div>
+  </footer>
+
   <script>
     const BATCH_SIZE = 200;
 
+    const yearEl = document.getElementById('year');
     const gridEl = document.getElementById('grid');
     const showMoreBtn = document.getElementById('showMore');
     const statusEl = document.getElementById('status');
@@ -420,15 +569,22 @@
 
     const categorySelect = document.getElementById('categorySelect');
     const conditionSelect = document.getElementById('conditionSelect');
+    const brandSelect = document.getElementById('brandSelect');
     const minPriceInput = document.getElementById('minPrice');
     const maxPriceInput = document.getElementById('maxPrice');
     const sortSelect = document.getElementById('sortSelect');
     const applyBtn = document.getElementById('applyBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const footerCategories = document.getElementById('footer-categories');
 
     let allItems = [];
     let filteredItems = [];
     let shown = 0;
+    const initialParams = new URLSearchParams(window.location.search);
+    const initialSearchQuery = initialParams.get('q') || '';
+    const initialCategory = initialParams.get('category') || '';
+
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
 
     function formatRub(value) {
       return `${Math.round(Number(value) || 0).toLocaleString('ru-RU')} ₽`;
@@ -494,6 +650,7 @@
       const oemIndex = Math.max(headers.findIndex(h => /^oem$|oem|артикул|partnumber/.test(h)), 13);
       const categoryIndex = Math.max(headers.findIndex(h => /category|категор/.test(h)), 0);
       const conditionIndex = Math.max(headers.findIndex(h => /condition|состояни/.test(h)), 1);
+      const makeIndex = Math.max(headers.findIndex(h => /^make$|марка авто|марка автомобиля/.test(h)), 7);
       const priceIndex = Math.max(headers.findIndex(h => /price|цена/.test(h)), 10);
       const imageIndex = (() => {
         const idx = headers.findIndex(h => h === 'images1' || /^images1$/.test(h) || /image1|изображ/.test(h));
@@ -504,6 +661,7 @@
         const rawTitle = (titleIndex >= 0 && cols[titleIndex]) ? cols[titleIndex] : (cols[3] || cols[0] || '');
         const rawOEM = (oemIndex >= 0 && cols[oemIndex]) ? cols[oemIndex] : '';
         const rawCategory = (categoryIndex >= 0 && cols[categoryIndex]) ? cols[categoryIndex] : 'Запчасть';
+        const rawMake = (makeIndex >= 0 && cols[makeIndex]) ? cols[makeIndex] : '';
         const rawPrice = (priceIndex >= 0 && cols[priceIndex]) ? cols[priceIndex] : '';
         const rawImage = (imageIndex >= 0 && cols[imageIndex]) ? cols[imageIndex] : '';
         const numericPrice = Number(String(rawPrice).replace(/[^\d.,]/g, '').replace(',', '.'));
@@ -513,6 +671,7 @@
           name: rawTitle || 'Деталь Mercedes‑Benz',
           category: rawCategory || 'Запчасть',
           condition: (conditionIndex >= 0 && cols[conditionIndex]) ? cols[conditionIndex] : '',
+          make: rawMake,
           price: Number.isFinite(numericPrice) ? numericPrice : 0,
           image: extractPrimaryImage(rawImage),
           oem: rawOEM,
@@ -530,6 +689,7 @@
             <div class="pill">${escapeHtml(item.category)}</div>
             <div class="product-title">${escapeHtml(item.name)}</div>
             <div><span class="price">${formatRub(item.price)}</span></div>
+            ${item.make ? `<div style="font-size: 11px; color: #6a6c6d; margin-top: 6px;">Бренд авто: ${escapeHtml(item.make)}</div>` : ''}
             ${item.oem ? `<div style="font-size: 11px; color: #8e9091; margin-top: 6px;">OEM: ${escapeHtml(item.oem)}</div>` : ''}
           </a>
         `;
@@ -585,20 +745,71 @@
       if (options.includes(current)) selectEl.value = current;
     }
 
+    function getSortedCategories(items) {
+      const counts = new Map();
+      items.forEach((item) => {
+        const category = String(item.category || '').trim();
+        if (!category) return;
+        counts.set(category, (counts.get(category) || 0) + 1);
+      });
+      return Array.from(counts.entries())
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
+    }
+
+    function renderFooterCategories(items) {
+      if (!footerCategories) return;
+      const categories = getSortedCategories(items).slice(0, 4);
+      footerCategories.innerHTML = categories.map(([category]) => {
+        const href = `./shop.html?category=${encodeURIComponent(category)}`;
+        return `<a href="${href}">${escapeHtml(category)}</a>`;
+      }).join('');
+    }
+
+    function normalizeSearchText(value) {
+      return String(value || '')
+        .toLowerCase()
+        .replace(/ё/g, 'е')
+        .replace(/[^a-zа-я0-9]+/gi, ' ')
+        .trim();
+    }
+
+    function getSearchTokens(value) {
+      return normalizeSearchText(value).split(/\s+/).filter(Boolean);
+    }
+
+    function compactSearchText(value) {
+      return normalizeSearchText(value).replace(/\s+/g, '');
+    }
+
     function getTextHaystack(item) {
       const parts = [
         item.oem || '',
         item.name || '',
         item.category || '',
         item.condition || '',
+        item.make || '',
       ];
-      return parts.join(' ').toLowerCase();
+      return parts.join(' ');
+    }
+
+    function matchesSearchQuery(item, query) {
+      const tokens = getSearchTokens(query);
+      if (!tokens.length) return true;
+
+      const haystack = getTextHaystack(item);
+      const normalizedHaystack = normalizeSearchText(haystack);
+      const compactHaystack = compactSearchText(haystack);
+      const compactQuery = compactSearchText(query);
+
+      return tokens.every((token) => normalizedHaystack.includes(token))
+        || (compactQuery.length > 1 && compactHaystack.includes(compactQuery));
     }
 
     function applyFilters() {
-      const q = String((searchInput && searchInput.value) || '').trim().toLowerCase();
+      const q = String((searchInput && searchInput.value) || '').trim();
       const cat = categorySelect ? String(categorySelect.value || '').trim() : '';
       const cond = conditionSelect ? String(conditionSelect.value || '').trim() : '';
+      const brand = brandSelect ? String(brandSelect.value || '').trim() : '';
 
       const minRaw = minPriceInput ? String(minPriceInput.value || '').trim() : '';
       const maxRaw = maxPriceInput ? String(maxPriceInput.value || '').trim() : '';
@@ -608,13 +819,16 @@
       let list = allItems.slice();
 
       if (q) {
-        list = list.filter((item) => getTextHaystack(item).includes(q));
+        list = list.filter((item) => matchesSearchQuery(item, q));
       }
       if (cat) {
         list = list.filter((item) => String(item.category || '').trim() === cat);
       }
       if (cond) {
         list = list.filter((item) => String(item.condition || '').trim() === cond);
+      }
+      if (brand) {
+        list = list.filter((item) => String(item.make || '').trim() === brand);
       }
       if (min !== null && Number.isFinite(min)) {
         list = list.filter((item) => Number(item.price || 0) >= min);
@@ -659,18 +873,32 @@
         }
 
         allItems = parsed;
+        renderFooterCategories(allItems);
         hideStatus();
         // Заполняем фильтры
         const categories = Array.from(new Set(allItems.map((x) => String(x.category || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru'));
         const conditions = Array.from(new Set(allItems.map((x) => String(x.condition || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru'));
+        const brands = Array.from(new Set(allItems.map((x) => String(x.make || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru'));
         fillSelect(categorySelect, categories);
         fillSelect(conditionSelect, conditions);
+        fillSelect(brandSelect, brands);
 
         // Стартовый вывод: первые 200 (без фильтров)
-        filteredItems = allItems.slice();
-        shown = 0;
-        gridEl.innerHTML = '';
-        appendNextBatch();
+        if (initialCategory && categorySelect) {
+          categorySelect.value = initialCategory;
+        }
+
+        if ((initialSearchQuery && searchInput) || (initialCategory && categorySelect && categorySelect.value === initialCategory)) {
+          if (initialSearchQuery && searchInput) {
+            searchInput.value = initialSearchQuery;
+          }
+          applyFilters();
+        } else {
+          filteredItems = allItems.slice();
+          shown = 0;
+          gridEl.innerHTML = '';
+          appendNextBatch();
+        }
 
         if (showMoreBtn) {
           showMoreBtn.addEventListener('click', appendNextBatch);
@@ -681,6 +909,7 @@
             if (searchInput) searchInput.value = '';
             if (categorySelect) categorySelect.value = '';
             if (conditionSelect) conditionSelect.value = '';
+            if (brandSelect) brandSelect.value = '';
             if (minPriceInput) minPriceInput.value = '';
             if (maxPriceInput) maxPriceInput.value = '';
             if (sortSelect) sortSelect.value = 'default';
